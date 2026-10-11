@@ -1,4 +1,3 @@
-import logging
 import socket
 
 from server.settings.components import config
@@ -16,7 +15,7 @@ DEBUG = True
 ALLOWED_HOSTS: list[str] = [
     config('DOMAIN_NAME'),
     'localhost',
-    '0.0.0.0',  # noqa: S104
+    '0.0.0.0',  # ruff: ignore[hardcoded-bind-all-interfaces]
     '127.0.0.1',
     '[::1]',
 ]
@@ -26,7 +25,6 @@ ALLOWED_HOSTS: list[str] = [
 INSTALLED_APPS += (
     # Better debug:
     'debug_toolbar',
-    'zeal',
 )
 
 # Django debug toolbar:
@@ -50,20 +48,6 @@ CORS_ALLOWED_ORIGINS.extend([
     'http://localhost',
     'http://127.0.0.1',
 ])
-
-# django-zeal
-# https://github.com/taobojlen/django-zeal
-
-# Should be the first in line:
-MIDDLEWARE = ('zeal.middleware.zeal_middleware', *MIDDLEWARE)
-
-# Logging N+1 requests:
-ZEAL_RAISE = True  # comment out if you want to allow N+1 requests
-ZEAL_SHOW_ALL_CALLERS = True
-ZEAL_LOGGER = logging.getLogger('django')
-ZEAL_ALLOWLIST = [
-    {'model': 'admin.*'},
-]
 
 # Disable persistent DB connections
 # https://docs.djangoproject.com/en/6.0/ref/databases/#caveats

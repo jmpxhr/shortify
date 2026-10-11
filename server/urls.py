@@ -21,47 +21,32 @@ from django.contrib.admindocs import urls as admindocs_urls
 from django.urls import include, path
 from django.views.generic import TemplateView
 from dmr.openapi import build_schema
-from dmr.openapi.views import OpenAPIJsonView, ScalarView, SwaggerView
-from dmr.openapi.views.yaml import OpenAPIYamlView
+from dmr.openapi.views import OpenAPIJsonView, SwaggerView
 from dmr.plugins.msgspec import MsgspecSerializer
 from dmr.routing import Router, build_404_handler, build_500_handler
 
-from server.apps.shortify import urls as shortify_urls
-from server.apps.shortify.api.urls import router as shortify_api_urls
-
 admin.autodiscover()
 
-router = Router(
-    'api/v1/',
-    [
-        path(
-            shortify_api_urls.prefix,
-            include((shortify_api_urls.urls, 'shortify')),
-        ),
-    ],
-)
+router = Router('api/')
+v1_router = Router('v1/')
+
+router.include(v1_router)
+
 schema = build_schema(router)
 
 handler404 = build_404_handler(router.prefix, serializer=MsgspecSerializer)
 handler500 = build_500_handler(router.prefix, serializer=MsgspecSerializer)
 
 urlpatterns = [
-    path('', include(shortify_urls, namespace='shortify')),
     # API:
-    path(router.prefix, include((router.urls, 'server'), namespace='api')),
+    router.to_urlpatterns(namespace='api'),
     # OpenAPI:
     path(
         'docs/openapi.json/',
         OpenAPIJsonView.as_view(schema),
         name='openapi_json',
     ),
-    path(
-        'docs/openapi.yaml/',
-        OpenAPIYamlView.as_view(schema),
-        name='openapi_yaml',
-    ),
     path('docs/', SwaggerView.as_view(schema), name='swagger'),
-    path('docs/scalar/', ScalarView.as_view(schema), name='scalar'),
     # django-admin:
     path('admin/doc/', include(admindocs_urls)),
     path('admin/', admin.site.urls),
