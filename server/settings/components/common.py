@@ -119,9 +119,7 @@ DEFAULT_AUTO_FIELD: Final = 'django.db.models.AutoField'
 # Django authentication system
 # https://docs.djangoproject.com/en/6.0/topics/auth/
 
-AUTHENTICATION_BACKENDS: tuple[str] = (
-    'django.contrib.auth.backends.ModelBackend',
-)
+AUTHENTICATION_BACKENDS: tuple[str] = ('django.contrib.auth.backends.ModelBackend',)
 
 PASSWORD_HASHERS: list[str] = [
     'django.contrib.auth.hashers.Argon2PasswordHasher',
@@ -175,7 +173,11 @@ STATICFILES_FINDERS = (
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR.joinpath('media')
 
-# Timeouts
-# https://docs.djangoproject.com/en/6.0/ref/settings/#std:setting-EMAIL_TIMEOUT
+# Email
+# https://docs.djangoproject.com/en/6.1/topics/email/#topic-email-configuration
 
-EMAIL_TIMEOUT = 5
+MAILERS = {
+    'default': {
+        'BACKEND': 'django.core.mail.backends.console.EmailBackend',
+    },
+}
