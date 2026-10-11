@@ -91,6 +91,7 @@ ignore = [
   "no-self-use",                               # do not require classmethod / staticmethod when self not used
   "raise-vanilla-args",                        # long exception messages from `tryceratops`
   "commented-out-code",                        # commented-out-code
+  "non-empty-init-module",
 ]
 
 # Plugin configs:
@@ -136,7 +137,7 @@ strict_settings = false
 
 [tool.pyrefly]
 # Docs: https://pyrefly.org
-project-include = ["server"]
+project-includes = ["server"]
 preset = "strict"
 min-severity = "warn"
 
