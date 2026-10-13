@@ -1,5 +1,6 @@
 # NOTE: simple layers go on top!
 
+import string
 from collections.abc import Callable
 from typing import Any
 
@@ -7,10 +8,7 @@ import punq
 
 
 def _global_namespace() -> dict[str, Any]:
-    # ruff: ignore[import-outside-top-level, unused-import]
     from django.conf import LazySettings
-
-    # ruff: ignore[import-outside-top-level, unused-import]
     from django.core.cache import BaseCache
 
     return locals()
@@ -22,14 +20,13 @@ def _create_injector[Thing](
 ) -> Callable[[Thing], Thing]:
     # We need to provide the same string names as we do in the definition.
     localns.pop('container')
-    localns.update(_global_namespace())
+    # localns.update(_global_namespace())
     # pyrefly: ignore [missing-attribute]
     container.registrations._localns.update(localns)  # ruff: ignore[private-member-access]
     return lambda service: service
 
 
 def _inject_django(container: punq.Container) -> None:
-    # ruff: ignore[import-outside-top-level]
     from django.conf import LazySettings, settings
 
     # Django:
@@ -40,12 +37,29 @@ def _inject_django(container: punq.Container) -> None:
     )
 
 
-def _inject_main(container: punq.Container) -> None:
+def _inject_shortify(container: punq.Container) -> None:
+    from server.apps.shortify.api import mappers as api_mappers
+    from server.apps.shortify.domain import interfaces, services, use_case
+    from server.apps.shortify.domain.constants import ENCODING_ALPHABET
+    from server.apps.shortify.infrastructure import mappers, repositories
 
     # Hacks to resolve annotations:
     inject = _create_injector(container, locals())
 
     # Things to register:
+    # Mappers:
+    container.register(mappers.ShortLinkMapper)
+    container.register(api_mappers.ShortLinkDtoMapper)
+    # Repositories:
+    container.register(repositories.ShortLinkRepository)
+    # Services:
+    container.register(interfaces.EncoderProtocol, services.Base62EncoderService)
+    container.register(
+        inject(services.ShortLinkGeneratorService),
+        _alphabet=ENCODING_ALPHABET,
+    )
+    # Use cases:
+    container.register(inject(use_case.CreateShortLink))
 
 
 def populate_dependencies(container: punq.Container) -> punq.Container:
@@ -53,5 +67,5 @@ def populate_dependencies(container: punq.Container) -> punq.Container:
     # Deps:
     _inject_django(container)
     # Apps:
-    _inject_main(container)
+    _inject_shortify(container)
     return container
