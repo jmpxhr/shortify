@@ -99,6 +99,9 @@ flake8-quotes.inline-quotes = "single"
 mccabe.max-complexity = 6
 pydocstyle.convention = "google"
 
+[tool.ruff.lint.per-file-ignores]
+"server/apps/*/migrations/*.py" = ["mutable-class-default"]
+
 [tool.mypy]
 # Mypy configuration:
 # https://mypy.readthedocs.io/en/latest/config_file.html
