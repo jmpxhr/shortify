@@ -122,7 +122,7 @@ DEFAULT_AUTO_FIELD: Final = 'django.db.models.AutoField'
 AUTHENTICATION_BACKENDS: tuple[str] = ('django.contrib.auth.backends.ModelBackend',)
 
 PASSWORD_HASHERS: list[str] = [
-    'django.contrib.auth.hashers.Argon2PasswordHasher',
+    # 'django.contrib.auth.hashers.Argon2PasswordHasher',
     'django.contrib.auth.hashers.PBKDF2PasswordHasher',
     'django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher',
 ]

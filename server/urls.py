@@ -25,10 +25,13 @@ from dmr.openapi.views import OpenAPIJsonView, SwaggerView
 from dmr.plugins.msgspec import MsgspecSerializer
 from dmr.routing import Router, build_404_handler, build_500_handler
 
+from server.apps.shortify.presentation.api.rest.v1.urls import router as shortify_router
+
 admin.autodiscover()
 
 router = Router('api/')
 v1_router = Router('v1/')
+v1_router.include(shortify_router)
 
 router.include(v1_router)
 
