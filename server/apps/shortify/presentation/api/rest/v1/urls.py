@@ -1,6 +1,9 @@
 from dmr.routing import Router, path
 
-from server.apps.shortify.presentation.api.rest.views import RedirectView, ShortLinkView
+from server.apps.shortify.presentation.api.rest.v1.views import (
+    RedirectView,
+    ShortLinkView,
+)
 
 router = Router(
     prefix='shortify/',

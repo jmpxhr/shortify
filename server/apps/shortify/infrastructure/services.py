@@ -2,7 +2,10 @@ import uuid
 from dataclasses import dataclass
 from typing import LiteralString, final, override
 
-from server.apps.shortify.application.interfaces import EncoderProtocol
+from server.apps.shortify.application.interfaces.services import (
+    EncoderProtocol,
+    ShortLinkGeneratorServiceProtocol,
+)
 
 
 @final
@@ -21,10 +24,11 @@ class Base62EncoderService(EncoderProtocol):
 
 @final
 @dataclass(frozen=True, kw_only=True, slots=True)
-class ShortLinkGeneratorService:
+class ShortLinkGeneratorService(ShortLinkGeneratorServiceProtocol):
     _alphabet: LiteralString
     _encoder: EncoderProtocol
 
+    @override
     def generate_code(self, *, length: int) -> str:
         code = self._encoder(alphabet=self._alphabet, number=uuid.uuid4().int)
         return code[:length]

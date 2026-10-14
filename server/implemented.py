@@ -1,12 +1,9 @@
 # NOTE: simple layers go on top!
 
-import string
 from collections.abc import Callable
 from typing import Any
 
 import punq
-
-from server.apps.shortify.application import services, use_case
 
 
 def _global_namespace() -> dict[str, Any]:
@@ -40,29 +37,47 @@ def _inject_django(container: punq.Container) -> None:
 
 
 def _inject_shortify(container: punq.Container) -> None:
-    from server.apps.shortify.application import interfaces
+    from server.apps.shortify.application import interfaces, use_cases
+    from server.apps.shortify.application.mappers import ShortLinkMapper
     from server.apps.shortify.domain.constants import ENCODING_ALPHABET
-    from server.apps.shortify.infrastructure import mappers, repositories
-    from server.apps.shortify.presentation.api.rest import mappers as api_mappers
+    from server.apps.shortify.infrastructure import mappers, repositories, services
+    from server.apps.shortify.presentation.api.rest.v1.mappers import (
+        ShortLinkPresentationMapper,
+    )
 
     # Hacks to resolve annotations:
     inject = _create_injector(container, locals())
 
     # Things to register:
+
     # Mappers:
-    container.register(mappers.ShortLinkMapper)
-    container.register(api_mappers.ShortLinkDtoMapper)
-    # Repositories:
-    container.register(repositories.ShortLinkRepository)
-    # Services:
-    container.register(interfaces.EncoderProtocol, services.Base62EncoderService)
+    container.register(ShortLinkPresentationMapper)
     container.register(
+        interfaces.mappers.EntityDtoShortLinkMapperProtocol,
+        ShortLinkMapper,
+    )
+    container.register(mappers.ShortLinkDBMapper)
+
+    # Repositories:
+    container.register(
+        interfaces.repositories.ShortLinkRepositoryProtocol,
+        repositories.ShortLinkRepository,
+    )
+
+    # Services:
+    container.register(
+        interfaces.services.EncoderProtocol,
+        services.Base62EncoderService,
+    )
+    container.register(
+        interfaces.services.ShortLinkGeneratorServiceProtocol,
         inject(services.ShortLinkGeneratorService),
         _alphabet=ENCODING_ALPHABET,
     )
+
     # Use cases:
-    container.register(inject(use_case.CreateShortLink))
-    container.register(inject(use_case.GetUrlFromShortLink))
+    container.register(inject(use_cases.CreateShortLink))
+    container.register(inject(use_cases.GetUrlFromShortLink))
 
 
 def populate_dependencies(container: punq.Container) -> punq.Container:

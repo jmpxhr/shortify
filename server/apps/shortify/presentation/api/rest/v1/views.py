@@ -7,15 +7,17 @@ from dmr.endpoint import Endpoint
 from dmr.errors import ErrorType
 from dmr.plugins.msgspec import MsgspecSerializer
 
-from server.apps.shortify.application import use_case
+from server.apps.shortify.application import use_cases
 from server.apps.shortify.application.exceptions import (
     ShortLinkCollisionError,
     ShortLinkNotFoundError,
 )
-from server.apps.shortify.application.use_case.short_link_get import GetUrlFromShortLink
+from server.apps.shortify.application.use_cases.short_link_get import (
+    GetUrlFromShortLink,
+)
 from server.apps.shortify.domain.exceptions import DomainValidationError
-from server.apps.shortify.presentation.api.rest import mappers
-from server.apps.shortify.presentation.api.rest.schemas import (
+from server.apps.shortify.presentation.api.rest.v1 import mappers
+from server.apps.shortify.presentation.api.rest.v1.schemas import (
     ShortLinkCreateSchema,
     ShortLinkPath,
     ShortLinkResponseSchema,
@@ -43,10 +45,11 @@ class ShortLinkView(HasContainer, Controller[MsgspecSerializer]):
         self,
         parsed_body: Body[ShortLinkCreateSchema],
     ) -> ShortLinkResponseSchema:
-        return self.resolve(mappers.ShortLinkDtoMapper)(
-            short_link=self.resolve(use_case.CreateShortLink)(
-                original_url=parsed_body.original_url
-            )
+        short_link_dto = self.resolve(use_cases.CreateShortLink)(
+            original_url=parsed_body.original_url,
+        )
+        return self.resolve(mappers.ShortLinkPresentationMapper)(
+            short_link=short_link_dto
         )
 
     @override

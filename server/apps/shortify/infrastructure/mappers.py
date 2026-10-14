@@ -8,7 +8,7 @@ from server.apps.shortify.infrastructure.models import ShortLink
 
 @final
 @dataclass(frozen=True, slots=True)
-class ShortLinkMapper:
+class ShortLinkDBMapper:
     """Map a ``Task`` Django model to its Entity"""
 
     def single(self, *, link: ShortLink) -> ShortLinkEntity:
