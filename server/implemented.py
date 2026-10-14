@@ -20,7 +20,7 @@ def _create_injector[Thing](
 ) -> Callable[[Thing], Thing]:
     # We need to provide the same string names as we do in the definition.
     localns.pop('container')
-    # localns.update(_global_namespace())
+    localns.update(_global_namespace())
     # pyrefly: ignore [missing-attribute]
     container.registrations._localns.update(localns)  # ruff: ignore[private-member-access]
     return lambda service: service
@@ -60,6 +60,7 @@ def _inject_shortify(container: punq.Container) -> None:
     )
     # Use cases:
     container.register(inject(use_case.CreateShortLink))
+    container.register(inject(use_case.GetUrlFromShortLink))
 
 
 def populate_dependencies(container: punq.Container) -> punq.Container:

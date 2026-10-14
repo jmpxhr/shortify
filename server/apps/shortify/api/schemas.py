@@ -26,3 +26,8 @@ class ShortLinkResponseSchema(msgspec.Struct):
 
     original_url: str
     short_code: str
+
+
+@final
+class ShortLinkPath(msgspec.Struct):
+    short_code: str
