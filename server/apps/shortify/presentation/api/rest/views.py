@@ -7,18 +7,18 @@ from dmr.endpoint import Endpoint
 from dmr.errors import ErrorType
 from dmr.plugins.msgspec import MsgspecSerializer
 
-from server.apps.shortify.api import mappers
-from server.apps.shortify.api.schemas import (
-    ShortLinkCreateSchema,
-    ShortLinkPath,
-    ShortLinkResponseSchema,
-)
 from server.apps.shortify.domain import use_case
 from server.apps.shortify.domain.exceptions import (
     ShortLinkCollisionError,
     ShortLinkNotFoundError,
 )
 from server.apps.shortify.domain.use_case.short_link_get import GetUrlFromShortLink
+from server.apps.shortify.presentation.api.rest import mappers
+from server.apps.shortify.presentation.api.rest.schemas import (
+    ShortLinkCreateSchema,
+    ShortLinkPath,
+    ShortLinkResponseSchema,
+)
 from server.common.di import HasContainer
 
 
