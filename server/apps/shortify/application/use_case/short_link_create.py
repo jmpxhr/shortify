@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, final
 from server.apps.shortify.domain.constants import SHORT_CODE_LENGTH
 
 if TYPE_CHECKING:
-    from server.apps.shortify.domain import services
+    from server.apps.shortify.application import services
     from server.apps.shortify.domain.entities import ShortLinkEntity
     from server.apps.shortify.infrastructure import mappers, repositories
 

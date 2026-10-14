@@ -6,6 +6,8 @@ from typing import Any
 
 import punq
 
+from server.apps.shortify.application import services, use_case
+
 
 def _global_namespace() -> dict[str, Any]:
     from django.conf import LazySettings
@@ -38,7 +40,7 @@ def _inject_django(container: punq.Container) -> None:
 
 
 def _inject_shortify(container: punq.Container) -> None:
-    from server.apps.shortify.domain import interfaces, services, use_case
+    from server.apps.shortify.application import interfaces
     from server.apps.shortify.domain.constants import ENCODING_ALPHABET
     from server.apps.shortify.infrastructure import mappers, repositories
     from server.apps.shortify.presentation.api.rest import mappers as api_mappers

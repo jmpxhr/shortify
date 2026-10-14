@@ -2,7 +2,7 @@ import uuid
 from dataclasses import dataclass
 from typing import LiteralString, final, override
 
-from server.apps.shortify.domain.interfaces import EncoderProtocol
+from server.apps.shortify.application.interfaces import EncoderProtocol
 
 
 @final

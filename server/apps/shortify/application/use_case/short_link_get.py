@@ -3,7 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, final
 
-from server.apps.shortify.domain.exceptions import ShortLinkNotFoundError
+from server.apps.shortify.application.exceptions import ShortLinkNotFoundError
 
 if TYPE_CHECKING:
     from server.apps.shortify.infrastructure import repositories
