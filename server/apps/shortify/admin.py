@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from server.apps.shortify.models import ShortLink
+from server.apps.shortify.infrastructure.models import ShortLink
 
 
 @admin.register(ShortLink)

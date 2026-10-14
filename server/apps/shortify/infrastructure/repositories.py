@@ -4,7 +4,7 @@ from typing import final
 from django.db import IntegrityError
 
 from server.apps.shortify.domain.exceptions import ShortLinkCollisionError
-from server.apps.shortify.models import ShortLink
+from server.apps.shortify.infrastructure.models import ShortLink
 
 
 @final
