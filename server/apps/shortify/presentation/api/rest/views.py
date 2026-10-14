@@ -13,6 +13,7 @@ from server.apps.shortify.application.exceptions import (
     ShortLinkNotFoundError,
 )
 from server.apps.shortify.application.use_case.short_link_get import GetUrlFromShortLink
+from server.apps.shortify.domain.exceptions import DomainValidationError
 from server.apps.shortify.presentation.api.rest import mappers
 from server.apps.shortify.presentation.api.rest.schemas import (
     ShortLinkCreateSchema,
@@ -55,7 +56,7 @@ class ShortLinkView(HasContainer, Controller[MsgspecSerializer]):
         controller: Controller[MsgspecSerializer],
         exc: Exception,
     ) -> HttpResponse:
-        if isinstance(exc, ValueError):
+        if isinstance(exc, DomainValidationError):
             return self.to_error(
                 self.format_error(
                     str(exc),
