@@ -7,10 +7,14 @@ from server.apps.shortify.application.dtos.short_link import ShortLinkDTO
 from server.apps.shortify.domain.constants import SHORT_CODE_LENGTH
 
 if TYPE_CHECKING:
-    from server.apps.shortify.application.interfaces import (
-        mappers,
-        repositories,
-        services,
+    from server.apps.shortify.application.interfaces.mappers import (
+        EntityDtoShortLinkMapperProtocol,
+    )
+    from server.apps.shortify.application.interfaces.repositories import (
+        ShortLinkRepositoryProtocol,
+    )
+    from server.apps.shortify.application.interfaces.services import (
+        ShortLinkGeneratorServiceProtocol,
     )
 
 
@@ -18,9 +22,9 @@ if TYPE_CHECKING:
 @final
 @dataclass(frozen=True, slots=True)
 class CreateShortLink:
-    _mapper: mappers.EntityDtoShortLinkMapperProtocol
-    _repository: repositories.ShortLinkRepositoryProtocol
-    _service: services.ShortLinkGeneratorServiceProtocol
+    _mapper: EntityDtoShortLinkMapperProtocol
+    _repository: ShortLinkRepositoryProtocol
+    _service: ShortLinkGeneratorServiceProtocol
 
     def __call__(self, *, original_url: str) -> ShortLinkDTO:
         short_code = self._service.generate_code(length=SHORT_CODE_LENGTH)

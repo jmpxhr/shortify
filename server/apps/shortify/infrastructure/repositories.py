@@ -13,13 +13,13 @@ from server.apps.shortify.domain.entities import ShortLinkEntity
 from server.apps.shortify.infrastructure.models import ShortLink
 
 if TYPE_CHECKING:
-    from server.apps.shortify.infrastructure import mappers
+    from server.apps.shortify.infrastructure.mappers import ShortLinkDBMapper
 
 
 @final
 @dataclass(frozen=True, slots=True)
 class ShortLinkRepository(ShortLinkRepositoryProtocol):
-    _mapper: mappers.ShortLinkDBMapper
+    _mapper: ShortLinkDBMapper
 
     @override
     def create(self, *, original_url: str, short_code: str) -> ShortLinkEntity:

@@ -6,13 +6,15 @@ from typing import TYPE_CHECKING, final
 from server.apps.shortify.application.exceptions import ShortLinkNotFoundError
 
 if TYPE_CHECKING:
-    from server.apps.shortify.application.interfaces import repositories
+    from server.apps.shortify.application.interfaces.repositories import (
+        ShortLinkRepositoryProtocol,
+    )
 
 
 @final
 @dataclass(frozen=True, slots=True)
 class GetUrlFromShortLink:
-    _repository: repositories.ShortLinkRepositoryProtocol
+    _repository: ShortLinkRepositoryProtocol
 
     def __call__(self, *, short_code: str) -> str:
         short_link_entity = self._repository.get_by_code(short_code=short_code)
