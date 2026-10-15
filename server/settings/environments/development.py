@@ -13,7 +13,7 @@ from server.settings.components.cors import CORS_ALLOWED_ORIGINS
 DEBUG = True
 
 ALLOWED_HOSTS: list[str] = [
-    config('DOMAIN_NAME'),
+    config('DOMAIN_NAME', default='localhost'),
     'localhost',
     '0.0.0.0',  # ruff: ignore[hardcoded-bind-all-interfaces]
     '127.0.0.1',

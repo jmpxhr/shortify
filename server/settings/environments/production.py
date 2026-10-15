@@ -5,10 +5,16 @@ This file is required and if development.py is present these
 values are overridden.
 """
 
+from django.core.exceptions import ImproperlyConfigured
 from dmr.settings import Settings
 
 from server.settings.components import config
 from server.settings.components.api import DMR_SETTINGS
+from server.settings.components.common import SECRET_KEY
+
+# Refuse to boot with the insecure development fallback secret key:
+if SECRET_KEY.startswith('django-insecure-'):
+    raise ImproperlyConfigured('Set DJANGO_SECRET_KEY in production!')
 
 # Production flags:
 # https://docs.djangoproject.com/en/6.0/howto/deployment/

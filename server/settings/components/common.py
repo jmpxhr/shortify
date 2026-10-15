@@ -20,7 +20,10 @@ from server.settings.components import BASE_DIR, config
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY: Final[str] = config('DJANGO_SECRET_KEY')
+SECRET_KEY: Final = config(
+    'DJANGO_SECRET_KEY',
+    default='django-insecure-dev-and-ci-only-key',
+)
 
 
 # Application definition
@@ -97,11 +100,11 @@ WSGI_APPLICATION = 'server.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': config('POSTGRES_DB'),
-        'USER': config('POSTGRES_USER'),
-        'PASSWORD': config('POSTGRES_PASSWORD'),
-        'HOST': config('DJANGO_DATABASE_HOST'),
-        'PORT': config('DJANGO_DATABASE_PORT', cast=int),
+        'NAME': config('POSTGRES_DB', default='shortify'),
+        'USER': config('POSTGRES_USER', default='shortify'),
+        'PASSWORD': config('POSTGRES_PASSWORD', default='shortify'),
+        'HOST': config('DJANGO_DATABASE_HOST', default='localhost'),
+        'PORT': config('DJANGO_DATABASE_PORT', cast=int, default=5432),  # noqa: WPS432
         'CONN_MAX_AGE': config('CONN_MAX_AGE', cast=int, default=60),
         'OPTIONS': {
             'connect_timeout': 10,
