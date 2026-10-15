@@ -61,7 +61,7 @@ remove_cache:
 # Run all type checkers
 [group('type-check')]
 type-check:
-    uv run python -m mypy .
+    uv run python -m mypy . --show-traceback
     uv run python -m pyrefly check --remove-unused-ignores
 
 # Run mypy
