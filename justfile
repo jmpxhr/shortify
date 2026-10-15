@@ -42,6 +42,15 @@ import-linter:
 wps:
     uv run python -m flake8 .
 
+# Run all checks
+[group('dev')]
+[group('tests')]
+test: lint type-check unit
+
+# Run unit tests
+[group('tests')]
+unit:
+
 # Remove cache dirs
 [group('dev')]
 remove_cache:
