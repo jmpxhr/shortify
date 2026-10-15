@@ -19,6 +19,7 @@ dev = [
   # Linting:
   "ruff>=0.16.10,<0.17.0",
   "import-linter>=2.15,<3.0",
+  "wemake-python-styleguide>=1.8.1,<2.0.0",
   # Type checking:
   "mypy>=2.4.0,<3.0.0",
   "pyrefly>=1.3.2,<2.0.0",
@@ -90,11 +91,16 @@ ignore = [
   "explicit-string-concatenation",             # prefer explicit string concat over implicit concat
   "magic-value-comparison",                    # do not report magic numbers
   "no-self-use",                               # do not require classmethod / staticmethod when self not used
+  "useless-import-alias",                      # do not raise on `as` re-exports
   "raise-vanilla-args",                        # long exception messages from `tryceratops`
   "commented-out-code",                        # commented-out-code
-  "non-empty-init-module",
+  "PLR09",                                     # WPS handles complexity separately
+  "redefined-loop-name",                       # allow to redefine iteration targets in for loops
+  "non-empty-init-module",                     # WPS handles `__init__.py` logic better
+  "raise-vanilla-args",                        # permit descriptive exception messages
 ]
 
+external = ["WPS"]
 # Plugin configs:
 flake8-quotes.inline-quotes = "single"
 mccabe.max-complexity = 6

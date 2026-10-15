@@ -10,7 +10,7 @@ def _global_namespace() -> dict[str, Any]:
     from django.conf import LazySettings
     from django.core.cache import BaseCache
 
-    return locals()
+    return locals()  # noqa: WPS421
 
 
 def _create_injector[Thing](
@@ -21,7 +21,8 @@ def _create_injector[Thing](
     localns.pop('container')
     localns.update(_global_namespace())
     # pyrefly: ignore [missing-attribute]
-    container.registrations._localns.update(localns)  # ruff: ignore[private-member-access]
+    # ruff: ignore[private-member-access]
+    container.registrations._localns.update(localns)
     return lambda service: service
 
 
@@ -46,7 +47,7 @@ def _inject_shortify(container: punq.Container) -> None:
     )
 
     # Hacks to resolve annotations:
-    inject = _create_injector(container, locals())
+    inject = _create_injector(container, locals())  # noqa: WPS421
 
     # Things to register:
 

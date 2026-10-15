@@ -12,6 +12,21 @@ ORIGINAL_URL_MAX_DISPLAY_LENGTH: Final = 65
 FALLBACK_DOMAIN: Final = 'http://127.0.0.1:8000'
 
 
+def _build_short_url(short_code: str) -> str:
+    """Absolute short URL for `short_code`, based on settings.DOMAIN."""
+    domain = getattr(settings, 'DOMAIN', FALLBACK_DOMAIN).rstrip('/')
+    path = reverse('api:redirect_link', kwargs={'short_code': short_code})
+    return f'{domain}{path}'
+
+
+def _render_link(url: str, label: str | None = None) -> SafeString:
+    return format_html(
+        '<a href="{url}" target="_blank" rel="noopener noreferrer">{label}</a>',
+        url=url,
+        label=label or url,
+    )
+
+
 @admin.register(ShortLink)
 class ShortLinkAdmin(admin.ModelAdmin[ShortLink]):
     list_display = (
@@ -51,37 +66,23 @@ class ShortLinkAdmin(admin.ModelAdmin[ShortLink]):
         ),
     )
 
-    @staticmethod
-    def _build_short_url(short_code: str) -> str:
-        """Absolute short URL for `short_code`, based on settings.DOMAIN."""
-        domain = getattr(settings, 'DOMAIN', FALLBACK_DOMAIN).rstrip('/')
-        path = reverse('api:redirect_link', kwargs={'short_code': short_code})
-        return f'{domain}{path}'
-
-    @staticmethod
-    def _render_link(url: str, label: str | None = None) -> SafeString:
-        return format_html(
-            '<a href="{url}" target="_blank" rel="noopener noreferrer">{label}</a>',
-            url=url,
-            label=label or url,
-        )
-
     @admin.display(description='Short code', ordering='short_code')
     def short_code_link(self, obj: ShortLink) -> SafeString:
         """Short code rendered as a clickable link."""
-        url = self._build_short_url(short_code=obj.short_code)
-        return self._render_link(url, label=obj.short_code)
+        url = _build_short_url(short_code=obj.short_code)
+        return _render_link(url, label=obj.short_code)
 
     @admin.display(description='Original URL', ordering='original_url')
     def original_url_truncated(self, obj: ShortLink) -> str:
         """Truncated original URL for the changelist."""
         url = obj.original_url
         if len(url) > ORIGINAL_URL_MAX_DISPLAY_LENGTH:
-            return f'{url[: ORIGINAL_URL_MAX_DISPLAY_LENGTH - 3]}...'
+            truncated_url = url[: ORIGINAL_URL_MAX_DISPLAY_LENGTH - 3]
+            return f'{truncated_url}...'
         return url
 
     @admin.display(description='Full short URL')
     def full_short_url(self, obj: ShortLink) -> SafeString:
         """Full short URL as an anchor, for the change form."""
-        url = self._build_short_url(short_code=obj.short_code)
-        return self._render_link(url)
+        url = _build_short_url(short_code=obj.short_code)
+        return _render_link(url)

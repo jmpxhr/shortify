@@ -7,6 +7,8 @@ from server.apps.shortify.application.interfaces.services import (
     ShortLinkGeneratorServiceProtocol,
 )
 
+_BASE_NUMBER = 62
+
 
 @final
 @dataclass(frozen=True, kw_only=True, slots=True)
@@ -17,7 +19,7 @@ class Base62EncoderService(EncoderProtocol):
             return alphabet[0]
         out = []
         while number:
-            number, rem = divmod(number, 62)
+            number, rem = divmod(number, _BASE_NUMBER)
             out.append(alphabet[rem])
         return ''.join(reversed(out))
 

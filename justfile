@@ -8,31 +8,46 @@ export UV_NO_SYNC := '1'
 _default:
     @just --list --unsorted --list-submodules
 
+# Install project dependencies
 [group('dev')]
 install *args='':
     uv sync --all-groups {{ args }}
 
 # Format code with ruff
-[group('dev')]
 [group('format')]
 format:
     uv run python -m ruff format
-    uv run python -m ruff check
 
 # Run all linters
-[group('dev')]
 [group('lint')]
 lint:
     uv run python -m ruff check --exit-non-zero-on-fix
     uv run python -m ruff format --check --diff
-    uv run import-linter lint
+    uv run python -m flake8 .
+    uv run import-linter lint --no-logo
 
+# Run ruff linter
+[group('lint')]
+ruff:
+    uv run python -m ruff check --exit-non-zero-on-fix
+    uv run python -m ruff format --check --diff
+
+# Run ruff linter
+[group('lint')]
+import-linter:
+    uv run import-linter lint --no-logo
+
+# Run wps linter
+[group('lint')]
+wps:
+    uv run python -m flake8 .
+
+# Remove cache dirs
 [group('dev')]
 remove_cache:
-  rm -rf .ruff_cache
-  rm -rf .mypy_cache
-  rm -rf .import_linter_cache
-
+    rm -rf .ruff_cache
+    rm -rf .mypy_cache
+    rm -rf .import_linter_cache
 
 # Run all type checkers
 [group('type-check')]
@@ -43,12 +58,12 @@ type-check:
 # Run mypy
 [group('type-check')]
 mypy *args='':
-    uv run python -m mypy . {{args}}
+    uv run python -m mypy . {{ args }}
 
 # Run pyrefly
 [group('type-check')]
 pyrefly *args:
-    uv run python -m pyrefly check --remove-unused-ignores {{args}}
+    uv run python -m pyrefly check --remove-unused-ignores {{ args }}
 
 # Start dev server
 [group('server')]

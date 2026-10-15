@@ -1,5 +1,5 @@
 import tomllib
-from typing import Any, cast
+from typing import cast
 
 from dmr.openapi import OpenAPIConfig
 from dmr.settings import Settings
@@ -19,7 +19,7 @@ def _get_project_meta() -> dict[str, str]:
 # django-modern-rest
 # https://django-modern-rest.readthedocs.io
 
-DMR_SETTINGS: Any = {
+DMR_SETTINGS = {
     # Default OpenAPI config:
     Settings.openapi_config: OpenAPIConfig(
         title='Django Shortify',

@@ -27,14 +27,14 @@ class ShortLinkRepository(ShortLinkRepositoryProtocol):
             short_link_instance = ShortLink.objects.create(
                 original_url=original_url, short_code=short_code
             )
-            return self._mapper.single(link=short_link_instance)
         except IntegrityError as exc:
             raise ShortLinkCollisionError(short_code) from exc
+        return self._mapper.single(link=short_link_instance)
 
     @override
     def get_by_code(self, *, short_code: str) -> ShortLinkEntity | None:
         try:
             short_link_instance = ShortLink.objects.get(short_code=short_code)
-            return self._mapper.single(link=short_link_instance)
         except ShortLink.DoesNotExist:
             return None
+        return self._mapper.single(link=short_link_instance)
