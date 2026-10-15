@@ -14,15 +14,25 @@ install *args='':
 
 # Format code with ruff
 [group('dev')]
+[group('format')]
 format:
     uv run python -m ruff format
     uv run python -m ruff check
 
 # Run all linters
 [group('dev')]
+[group('lint')]
 lint:
     uv run python -m ruff check --exit-non-zero-on-fix
     uv run python -m ruff format --check --diff
+    uv run import-linter lint
+
+[group('dev')]
+remove_cache:
+  rm -rf .ruff_cache
+  rm -rf .mypy_cache
+  rm -rf .import_linter_cache
+
 
 # Run all type checkers
 [group('type-check')]
