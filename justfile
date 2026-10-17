@@ -26,6 +26,10 @@ lint:
     uv run python -m flake8 .
     uv run import-linter lint --no-logo
 
+[group('lint')]
+typos *args:
+    uv run typos {{ args }}
+
 # Run ruff linter
 [group('lint')]
 ruff:
