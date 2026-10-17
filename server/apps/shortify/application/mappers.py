@@ -21,10 +21,10 @@ class ShortLinkMapper(EntityDtoShortLinkMapperProtocol):
         )
 
     @override
-    def to_dto(self, entitiy: ShortLinkEntity) -> ShortLinkDTO:
+    def to_dto(self, entity: ShortLinkEntity) -> ShortLinkDTO:
         return ShortLinkDTO(
-            original_url=entitiy.original_url,
-            short_code=entitiy.short_code,
-            created_at=entitiy.created_at,
-            updated_at=entitiy.updated_at,
+            original_url=entity.original_url,
+            short_code=entity.short_code,
+            created_at=entity.created_at,
+            updated_at=entity.updated_at,
         )
