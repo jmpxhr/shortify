@@ -8,5 +8,5 @@ from typing import final
 class ShortLinkDTO:
     original_url: str
     short_code: str
-    create_at: datetime
+    created_at: datetime
     updated_at: datetime

@@ -15,7 +15,7 @@ class ShortLinkDBMapper:
         return ShortLinkEntity(
             original_url=link.original_url,
             short_code=link.short_code,
-            create_at=link.created_at,
+            created_at=link.created_at,
             updated_at=link.updated_at,
         )
 

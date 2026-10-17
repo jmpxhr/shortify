@@ -11,7 +11,7 @@ from server.apps.shortify.domain.exceptions import DomainValidationError
 class ShortLinkEntity:
     original_url: str
     short_code: str
-    create_at: datetime
+    created_at: datetime
     updated_at: datetime
 
     def __post_init__(self) -> None:

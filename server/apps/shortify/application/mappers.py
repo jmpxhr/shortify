@@ -16,7 +16,7 @@ class ShortLinkMapper(EntityDtoShortLinkMapperProtocol):
         return ShortLinkEntity(
             original_url=dto.original_url,
             short_code=dto.short_code,
-            create_at=dto.create_at,
+            created_at=dto.created_at,
             updated_at=dto.updated_at,
         )
 
@@ -25,6 +25,6 @@ class ShortLinkMapper(EntityDtoShortLinkMapperProtocol):
         return ShortLinkDTO(
             original_url=entitiy.original_url,
             short_code=entitiy.short_code,
-            create_at=entitiy.create_at,
+            created_at=entitiy.created_at,
             updated_at=entitiy.updated_at,
         )
