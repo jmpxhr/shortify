@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from typing import final
 
 from server.apps.shortify.domain.entities import ShortLinkEntity
-from server.apps.shortify.infrastructure.models import ShortLink
+from server.apps.shortify.infrastructure.db.models import ShortLink
 
 
 @final

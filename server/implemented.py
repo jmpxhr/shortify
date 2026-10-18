@@ -37,11 +37,17 @@ def _inject_django(container: punq.Container) -> None:
     )
 
 
-def _inject_shortify(container: punq.Container) -> None:
+# TODO: Resolve WPS213
+def _inject_shortify(container: punq.Container) -> None:  # noqa: WPS213
     from server.apps.shortify.application import interfaces, use_cases
     from server.apps.shortify.application.mappers import ShortLinkMapper
     from server.apps.shortify.domain.constants import ENCODING_ALPHABET
-    from server.apps.shortify.infrastructure import mappers, repositories, services
+    from server.apps.shortify.infrastructure import services
+    from server.apps.shortify.infrastructure.db import (
+        mappers,
+        repositories,
+        transaction,
+    )
     from server.apps.shortify.presentation.api.rest.v1.mappers import (
         ShortLinkPresentationMapper,
     )
@@ -50,6 +56,11 @@ def _inject_shortify(container: punq.Container) -> None:
     inject = _create_injector(container, locals())  # noqa: WPS421
 
     # Things to register:
+
+    container.register(
+        interfaces.transaction.TransactionProtocol,
+        transaction.TransactionAtomic,
+    )
 
     # Mappers:
     container.register(ShortLinkPresentationMapper)
@@ -64,6 +75,10 @@ def _inject_shortify(container: punq.Container) -> None:
         interfaces.repositories.ShortLinkRepositoryProtocol,
         repositories.ShortLinkRepository,
     )
+    container.register(
+        interfaces.repositories.ClickEventRepositoryProtocol,
+        repositories.ClickEventRepository,
+    )
 
     # Services:
     container.register(
@@ -74,6 +89,10 @@ def _inject_shortify(container: punq.Container) -> None:
         interfaces.services.ShortLinkGeneratorServiceProtocol,
         inject(services.ShortLinkGeneratorService),
         _alphabet=ENCODING_ALPHABET,
+    )
+    container.register(
+        interfaces.services.GeoResolverServiceProtocol,
+        services.GeoIpResolverService,
     )
 
     # Use cases:

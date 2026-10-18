@@ -18,6 +18,7 @@ class ShortLinkMapper(EntityDtoShortLinkMapperProtocol):
             short_code=dto.short_code,
             created_at=dto.created_at,
             updated_at=dto.updated_at,
+            clicks=dto.clicks,
         )
 
     @override
@@ -27,4 +28,5 @@ class ShortLinkMapper(EntityDtoShortLinkMapperProtocol):
             short_code=entity.short_code,
             created_at=entity.created_at,
             updated_at=entity.updated_at,
+            clicks=entity.clicks,
         )

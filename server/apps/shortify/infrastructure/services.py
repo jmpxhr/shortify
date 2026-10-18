@@ -1,9 +1,14 @@
 import uuid
 from dataclasses import dataclass
+from ipaddress import AddressValueError
 from typing import LiteralString, final, override
+
+from django.contrib.gis.geoip2 import GeoIP2, GeoIP2Exception
+from django.core.exceptions import SuspiciousOperation
 
 from server.apps.shortify.application.interfaces.services import (
     EncoderProtocol,
+    GeoResolverServiceProtocol,
     ShortLinkGeneratorServiceProtocol,
 )
 
@@ -34,3 +39,22 @@ class ShortLinkGeneratorService(ShortLinkGeneratorServiceProtocol):
     def generate_code(self, *, length: int) -> str:
         code = self._encoder(alphabet=self._alphabet, number=uuid.uuid4().int)
         return code[:length]
+
+
+# TODO: remove GeoIP2Exception and noqa after geo setup
+@final
+@dataclass(frozen=True, kw_only=True, slots=True)
+class GeoIpResolverService(GeoResolverServiceProtocol):
+    @override
+    def resolve_country(self, *, ip: str | None) -> str | None:
+        if not ip:
+            return None
+        try:
+            return GeoIP2().country_code(ip)
+        except (  # noqa: WPS239
+            FileNotFoundError,
+            SuspiciousOperation,
+            AddressValueError,
+            GeoIP2Exception,
+        ):
+            return None

@@ -29,11 +29,11 @@ from server.apps.shortify.presentation.api.rest.v1.urls import router as shortif
 
 admin.autodiscover()
 
-v1_router = Router('v1/')
-v1_router.include(shortify_router, namespace='shortify')
+router_v1 = Router('v1/')
+router_v1.include(shortify_router)
 
 router = Router('api/')
-router.include(v1_router, namespace='v1')
+router.include(router_v1, namespace='v1')
 
 schema = build_schema(router)
 

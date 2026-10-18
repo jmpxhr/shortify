@@ -2,12 +2,22 @@ from http import HTTPStatus
 from typing import final, override
 
 from django.http import HttpResponse
-from dmr import Body, Controller, HeaderSpec, Path, RedirectTo, ResponseSpec, modify
+from dmr import (
+    Body,
+    Controller,
+    Headers,
+    HeaderSpec,
+    Path,
+    RedirectTo,
+    ResponseSpec,
+    modify,
+)
 from dmr.endpoint import Endpoint
 from dmr.errors import ErrorType
 from dmr.plugins.msgspec import MsgspecSerializer
 
 from server.apps.shortify.application import use_cases
+from server.apps.shortify.application.dtos.click_event import ClickContext
 from server.apps.shortify.application.exceptions import (
     ShortLinkCollisionError,
     ShortLinkNotFoundError,
@@ -18,6 +28,7 @@ from server.apps.shortify.application.use_cases.short_link_get import (
 from server.apps.shortify.domain.exceptions import DomainValidationError
 from server.apps.shortify.presentation.api.rest.v1 import mappers
 from server.apps.shortify.presentation.api.rest.v1.schemas import (
+    RedirectHeaders,
     ShortLinkCreateSchema,
     ShortLinkPath,
     ShortLinkResponseSchema,
@@ -98,9 +109,18 @@ class RedirectView(HasContainer, Controller[MsgspecSerializer]):
             ),
         ],
     )
-    def get(self, parsed_path: Path[ShortLinkPath]) -> None:
+    def get(
+        self,
+        parsed_path: Path[ShortLinkPath],
+        parsed_headers: Headers[RedirectHeaders],
+    ) -> None:
         original_url = self.resolve(GetUrlFromShortLink)(
             short_code=parsed_path.short_code,
+            click_context=ClickContext(
+                referer=parsed_headers.referer,
+                user_agent=parsed_headers.user_agent,
+                ip=self._client_ip,
+            ),
         )
         raise RedirectTo(original_url, status_code=HTTPStatus.FOUND)
 
@@ -120,3 +140,10 @@ class RedirectView(HasContainer, Controller[MsgspecSerializer]):
                 status_code=HTTPStatus.NOT_FOUND,
             )
         return super().handle_error(endpoint, controller, exc)
+
+    @property
+    def _client_ip(self) -> str | None:
+        forwarded = str(self.request.META.get('HTTP_X_FORWARDED_FOR'))
+        if forwarded:
+            return forwarded.split(',', maxsplit=1)[0].strip()
+        return self.request.META.get('REMOTE_ADDR')

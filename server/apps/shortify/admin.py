@@ -6,7 +6,7 @@ from django.urls import reverse
 from django.utils.html import format_html
 from django.utils.safestring import SafeString
 
-from server.apps.shortify.infrastructure.models import ShortLink
+from server.apps.shortify.infrastructure.db.models import ClickEvent, ShortLink
 
 ORIGINAL_URL_MAX_DISPLAY_LENGTH: Final = 65
 FALLBACK_DOMAIN: Final = 'http://127.0.0.1:8000'
@@ -15,7 +15,7 @@ FALLBACK_DOMAIN: Final = 'http://127.0.0.1:8000'
 def _build_short_url(short_code: str) -> str:
     """Absolute short URL for `short_code`, based on settings.DOMAIN."""
     domain = getattr(settings, 'DOMAIN', FALLBACK_DOMAIN).rstrip('/')
-    path = reverse('api:redirect_link', kwargs={'short_code': short_code})
+    path = reverse('api:v1:redirect:redirect_link', kwargs={'short_code': short_code})
     return f'{domain}{path}'
 
 
@@ -86,3 +86,38 @@ class ShortLinkAdmin(admin.ModelAdmin[ShortLink]):
         """Full short URL as an anchor, for the change form."""
         url = _build_short_url(short_code=obj.short_code)
         return _render_link(url)
+
+
+@admin.register(ClickEvent)
+class ClickEventAdmin(admin.ModelAdmin[ClickEvent]):
+    list_display = (
+        'id',
+        'link',
+        'country',
+        'created_at',
+    )
+    list_filter = ('created_at', 'country', 'link')
+    search_fields = ('id', 'link__slug', 'country')
+    readonly_fields = (
+        'id',
+        'link',
+        'referer',
+        'user_agent',
+        'country',
+        'created_at',
+    )
+    fieldsets = (
+        (
+            'Click Information',
+            {
+                'fields': ('id', 'link', 'created_at'),
+            },
+        ),
+        (
+            'Request Details',
+            {
+                'fields': ('referer', 'user_agent', 'country'),
+                'classes': ('collapse',),
+            },
+        ),
+    )

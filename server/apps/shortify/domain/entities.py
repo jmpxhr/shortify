@@ -13,6 +13,7 @@ class ShortLinkEntity:
     short_code: str
     created_at: datetime
     updated_at: datetime
+    clicks: int = 0
 
     def __post_init__(self) -> None:
         """Validate entity fields after initialization."""

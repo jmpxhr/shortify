@@ -5,12 +5,13 @@ from server.apps.shortify.presentation.api.rest.v1.views import (
     ShortLinkView,
 )
 
-router = Router(
-    prefix='',
+_redirect_router = Router(
+    prefix='s/',
     urls=[
         path('<str:short_code>/', RedirectView.as_view(), name='redirect_link'),
     ],
 )
+
 
 _links_router = Router(
     'links/',
@@ -20,4 +21,6 @@ _links_router = Router(
     tags=['Links'],
 )
 
-router.include(_links_router)
+router = Router('')
+router.include(_redirect_router, namespace='redirect')
+router.include(_links_router, namespace='links')

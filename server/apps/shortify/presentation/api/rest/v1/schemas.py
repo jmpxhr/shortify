@@ -31,3 +31,9 @@ class ShortLinkResponseSchema(msgspec.Struct):
 @final
 class ShortLinkPath(msgspec.Struct):
     short_code: str
+
+
+@final
+class RedirectHeaders(msgspec.Struct):
+    referer: str = ''
+    user_agent: str = msgspec.field(default='', name='User-Agent')
