@@ -30,6 +30,10 @@ class ShortLink(models.Model):
         verbose_name='updated date',
         auto_now=True,
     )
+    clicks_count = models.PositiveIntegerField(
+        verbose_name='clicks count',
+        default=0,
+    )
 
     class Meta(TypedModelMeta):
         verbose_name = 'Short link'
