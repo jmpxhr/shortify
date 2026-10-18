@@ -45,6 +45,8 @@ class ShortLinkView(HasContainer, Controller[MsgspecSerializer]):
         self,
         parsed_body: Body[ShortLinkCreateSchema],
     ) -> ShortLinkResponseSchema:
+        """Create short link"""
+
         short_link_dto = self.resolve(use_cases.CreateShortLink)(
             original_url=parsed_body.original_url,
         )

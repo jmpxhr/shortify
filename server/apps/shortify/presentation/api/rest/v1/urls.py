@@ -6,10 +6,18 @@ from server.apps.shortify.presentation.api.rest.v1.views import (
 )
 
 router = Router(
-    prefix='shortify/',
+    prefix='',
     urls=[
-        path('', ShortLinkView.as_view(), name='create_link'),
         path('<str:short_code>/', RedirectView.as_view(), name='redirect_link'),
     ],
-    tags=['shortify'],
 )
+
+_links_router = Router(
+    'links/',
+    urls=[
+        path('', ShortLinkView.as_view(), name='create_link'),
+    ],
+    tags=['Links'],
+)
+
+router.include(_links_router)
