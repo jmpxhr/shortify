@@ -31,7 +31,7 @@ class ShortLink(models.Model):
         default=0,
     )
 
-    objects: ClassVar[models.Manager[Self]]
+    objects: ClassVar[models.Manager[Self]]  # noqa: WPS110
 
     class Meta(TypedModelMeta):
         verbose_name = 'Short link'
