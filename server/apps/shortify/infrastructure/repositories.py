@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING, final, override
 
 from django.db import IntegrityError
+from django.db.models import F as Field
 
 from server.apps.shortify.application.exceptions import ShortLinkCollisionError
 from server.apps.shortify.application.interfaces.repositories import (
@@ -38,3 +39,9 @@ class ShortLinkRepository(ShortLinkRepositoryProtocol):
         except ShortLink.DoesNotExist:
             return None
         return self._mapper.single(link=short_link_instance)
+
+    @override
+    def increment_clicks(self, *, short_code: str) -> None:
+        ShortLink.objects.filter(short_code=short_code).update(
+            clicks=Field('clicks') + 1,
+        )

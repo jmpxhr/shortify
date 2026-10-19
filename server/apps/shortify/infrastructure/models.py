@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, override
+from typing import TYPE_CHECKING, ClassVar, Self, override
 
 from django.db import models
 
@@ -30,6 +30,8 @@ class ShortLink(models.Model):
         verbose_name='clicks count',
         default=0,
     )
+
+    objects: ClassVar[models.Manager[Self]]
 
     class Meta(TypedModelMeta):
         verbose_name = 'Short link'

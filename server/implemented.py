@@ -96,8 +96,15 @@ def _inject_use_cases(
 
 
 def _inject_shortify(container: punq.Container) -> None:
+    from server.apps.shortify.application.interfaces.transactions import (
+        TransactionProtocol,
+    )
+    from server.apps.shortify.infrastructure.transactions import TransactionAtomic
+
     # Hacks to resolve annotations:
     inject = _create_injector(container, locals())  # noqa: WPS421
+
+    container.register(TransactionProtocol, TransactionAtomic)
 
     _inject_mappers(container)
     _inject_repositories(container)

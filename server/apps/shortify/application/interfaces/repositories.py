@@ -10,3 +10,6 @@ class ShortLinkRepositoryProtocol(Protocol):
 
     @abstractmethod
     def get_by_code(self, *, short_code: str) -> ShortLinkEntity | None: ...
+
+    @abstractmethod
+    def increment_clicks(self, *, short_code: str) -> None: ...
