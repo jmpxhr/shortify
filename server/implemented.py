@@ -37,48 +37,72 @@ def _inject_django(container: punq.Container) -> None:
     )
 
 
-def _inject_shortify(container: punq.Container) -> None:
-    from server.apps.shortify.application import interfaces, use_cases
+def _inject_mappers(container: punq.Container) -> None:
+    from server.apps.shortify.application.interfaces.mappers import (
+        EntityDtoShortLinkMapperProtocol,
+    )
     from server.apps.shortify.application.mappers import ShortLinkMapper
-    from server.apps.shortify.domain.constants import ENCODING_ALPHABET
-    from server.apps.shortify.infrastructure import mappers, repositories, services
+    from server.apps.shortify.infrastructure.mappers import ShortLinkDBMapper
     from server.apps.shortify.presentation.api.rest.v1.mappers import (
         ShortLinkPresentationMapper,
     )
 
-    # Hacks to resolve annotations:
-    inject = _create_injector(container, locals())  # noqa: WPS421
-
-    # Things to register:
-
-    # Mappers:
     container.register(ShortLinkPresentationMapper)
-    container.register(
-        interfaces.mappers.EntityDtoShortLinkMapperProtocol,
-        ShortLinkMapper,
-    )
-    container.register(mappers.ShortLinkDBMapper)
+    container.register(EntityDtoShortLinkMapperProtocol, ShortLinkMapper)
+    container.register(ShortLinkDBMapper)
 
-    # Repositories:
-    container.register(
-        interfaces.repositories.ShortLinkRepositoryProtocol,
-        repositories.ShortLinkRepository,
+
+def _inject_repositories(container: punq.Container) -> None:
+    from server.apps.shortify.application.interfaces.repositories import (
+        ShortLinkRepositoryProtocol,
+    )
+    from server.apps.shortify.infrastructure.repositories import ShortLinkRepository
+
+    container.register(ShortLinkRepositoryProtocol, ShortLinkRepository)
+
+
+def _inject_services(
+    container: punq.Container,
+    *,
+    inject: Callable[[Any], Any],
+) -> None:
+    from server.apps.shortify.application.interfaces.services import (
+        EncoderProtocol,
+        ShortLinkGeneratorServiceProtocol,
+    )
+    from server.apps.shortify.domain.constants import ENCODING_ALPHABET
+    from server.apps.shortify.infrastructure.services import (
+        Base62EncoderService,
+        ShortLinkGeneratorService,
     )
 
-    # Services:
+    container.register(EncoderProtocol, Base62EncoderService)
     container.register(
-        interfaces.services.EncoderProtocol,
-        services.Base62EncoderService,
-    )
-    container.register(
-        interfaces.services.ShortLinkGeneratorServiceProtocol,
-        inject(services.ShortLinkGeneratorService),
+        ShortLinkGeneratorServiceProtocol,
+        inject(ShortLinkGeneratorService),
         _alphabet=ENCODING_ALPHABET,
     )
 
-    # Use cases:
+
+def _inject_use_cases(
+    container: punq.Container,
+    *,
+    inject: Callable[[Any], Any],
+) -> None:
+    from server.apps.shortify.application import use_cases
+
     container.register(inject(use_cases.CreateShortLink))
     container.register(inject(use_cases.GetUrlFromShortLink))
+
+
+def _inject_shortify(container: punq.Container) -> None:
+    # Hacks to resolve annotations:
+    inject = _create_injector(container, locals())  # noqa: WPS421
+
+    _inject_mappers(container)
+    _inject_repositories(container)
+    _inject_services(container, inject=inject)
+    _inject_use_cases(container, inject=inject)
 
 
 def populate_dependencies(container: punq.Container) -> punq.Container:
