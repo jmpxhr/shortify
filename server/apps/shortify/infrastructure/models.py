@@ -26,9 +26,9 @@ class ShortLink(models.Model):
         verbose_name='created date',
         auto_now_add=True,
     )
-    updated_at = models.DateTimeField(
-        verbose_name='updated date',
-        auto_now=True,
+    clicks = models.PositiveIntegerField(
+        verbose_name='clicks count',
+        default=0,
     )
 
     class Meta(TypedModelMeta):

@@ -9,4 +9,4 @@ class ShortLinkDTO:
     original_url: str
     short_code: str
     created_at: datetime
-    updated_at: datetime
+    clicks: int

@@ -15,7 +15,7 @@ FALLBACK_DOMAIN: Final = 'http://127.0.0.1:8000'
 def _build_short_url(short_code: str) -> str:
     """Absolute short URL for `short_code`, based on settings.DOMAIN."""
     domain = getattr(settings, 'DOMAIN', FALLBACK_DOMAIN).rstrip('/')
-    path = reverse('api:redirect_link', kwargs={'short_code': short_code})
+    path = reverse('api:v1:redirect_link', kwargs={'short_code': short_code})
     return f'{domain}{path}'
 
 
@@ -33,11 +33,12 @@ class ShortLinkAdmin(admin.ModelAdmin[ShortLink]):
         'id',
         'short_code_link',
         'original_url_truncated',
+        'clicks',
         'created_at',
     )
     list_filter = ('created_at',)
     search_fields = ('short_code', 'original_url')
-    readonly_fields = ('created_at', 'updated_at', 'full_short_url')
+    readonly_fields = ('created_at', 'clicks', 'full_short_url')
 
     fieldsets = (
         (
@@ -46,6 +47,7 @@ class ShortLinkAdmin(admin.ModelAdmin[ShortLink]):
                 'fields': [
                     'short_code',
                     'original_url',
+                    'clicks',
                 ],
             },
         ),
@@ -60,7 +62,7 @@ class ShortLinkAdmin(admin.ModelAdmin[ShortLink]):
         (
             'Stats and tech data',
             {
-                'fields': ['created_at', 'updated_at'],
+                'fields': ['created_at'],
                 'classes': ['collapse'],
             },
         ),

@@ -13,10 +13,11 @@ class ShortLinkDBMapper:
 
     def single(self, *, link: ShortLink) -> ShortLinkEntity:
         return ShortLinkEntity(
+            id=link.pk,
             original_url=link.original_url,
             short_code=link.short_code,
             created_at=link.created_at,
-            updated_at=link.updated_at,
+            clicks=link.clicks,
         )
 
     def many(self, *, links: Iterable[ShortLink]) -> list[ShortLinkEntity]:

@@ -9,10 +9,11 @@ from server.apps.shortify.domain.exceptions import DomainValidationError
 @final
 @dataclass(frozen=True, kw_only=True, slots=True)
 class ShortLinkEntity:
+    id: int
     original_url: str
     short_code: str
     created_at: datetime
-    updated_at: datetime
+    clicks: int = 0
 
     def __post_init__(self) -> None:
         """Validate entity fields after initialization."""
