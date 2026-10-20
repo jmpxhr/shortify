@@ -1,0 +1,21 @@
+from dmr.routing import Router, path
+
+from server.apps.accounts.presentation.api.rest.v1.views import (
+    LoginView,
+    LogoutView,
+    RefreshView,
+    SignUpView,
+    VerifyView,
+)
+
+router = Router(
+    'auth/',
+    urls=[
+        path('sign-up/', SignUpView.as_view(), name='sign_up'),
+        path('', LoginView.as_view(), name='login'),
+        path('refresh/', RefreshView.as_view(), name='refresh'),
+        path('verify/', VerifyView.as_view(), name='verify'),
+        path('logout/', LogoutView.as_view(), name='logout'),
+    ],
+    tags=['Auth'],
+)

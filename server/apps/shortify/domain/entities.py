@@ -1,8 +1,12 @@
+import re
 from dataclasses import dataclass
 from datetime import datetime
 from typing import final
 
-from server.apps.shortify.domain.constants import ORIGINAL_URL_MAX_LENGTH
+from server.apps.shortify.domain.constants import (
+    ORIGINAL_URL_MAX_LENGTH,
+    ORIGINAL_URL_PATTERN,
+)
 from server.apps.shortify.domain.exceptions import DomainValidationError
 
 
@@ -27,7 +31,7 @@ class ShortLinkEntity:
                 f'(got {len(self.original_url)})',
             )
 
-        if not self.original_url.startswith(('http://', 'https://')):
+        if re.match(ORIGINAL_URL_PATTERN, self.original_url) is None:
             raise DomainValidationError(
                 'original_url must start with http:// or https://',
             )

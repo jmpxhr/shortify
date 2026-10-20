@@ -4,6 +4,7 @@ import msgspec
 
 from server.apps.shortify.domain.constants import (
     ORIGINAL_URL_MAX_LENGTH,
+    ORIGINAL_URL_PATTERN,
     SHORT_CODE_PATTERN,
     SHORT_URL_MAX_LENGTH,
 )
@@ -17,7 +18,7 @@ class ShortLinkCreateSchema(msgspec.Struct):
             extra_json_schema={
                 'minLength': 1,
                 'maxLength': ORIGINAL_URL_MAX_LENGTH,
-                'pattern': '^https?://',
+                'pattern': ORIGINAL_URL_PATTERN,
                 'example': 'https://github.com/wemake-services/wemake-django-template',
             }
         ),
@@ -28,8 +29,16 @@ class ShortLinkCreateSchema(msgspec.Struct):
 class ShortLinkResponseSchema(msgspec.Struct):
     """Schema for a short link API response."""
 
-    original_url: str
-    short_code: str
+    original_url: Annotated[
+        str,
+        msgspec.Meta(
+            examples=['https://github.com/wemake-services/wemake-django-template'],
+        ),
+    ]
+    short_code: Annotated[
+        str,
+        msgspec.Meta(examples=['aB3xY9']),
+    ]
 
 
 @final

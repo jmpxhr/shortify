@@ -56,18 +56,6 @@ STATICFILES_STORAGE = (
 MEDIA_ROOT = '/var/www/django/media'
 
 
-# Password validation
-# https://docs.djangoproject.com/en/6.0/ref/settings/#auth-password-validators
-
-_PASS = 'django.contrib.auth.password_validation'  # ruff: ignore[hardcoded-password-string]
-AUTH_PASSWORD_VALIDATORS = [
-    {'NAME': f'{_PASS}.UserAttributeSimilarityValidator'},
-    {'NAME': f'{_PASS}.MinimumLengthValidator'},
-    {'NAME': f'{_PASS}.CommonPasswordValidator'},
-    {'NAME': f'{_PASS}.NumericPasswordValidator'},
-]
-
-
 # Security
 # https://docs.djangoproject.com/en/6.0/topics/security/
 

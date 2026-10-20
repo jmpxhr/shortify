@@ -2,10 +2,10 @@ from http import HTTPStatus
 from typing import final, override
 
 from django.http import HttpResponse
-from dmr import Body, Controller, HeaderSpec, Path, RedirectTo, ResponseSpec, modify
+from dmr import Controller, HeaderSpec, Path, RedirectTo, ResponseSpec, modify
 from dmr.endpoint import Endpoint
 from dmr.errors import ErrorType
-from dmr.plugins.msgspec import MsgspecSerializer
+from dmr.plugins.msgspec import BodyMsgspec, MsgspecSerializer
 
 from server.apps.shortify.application import use_cases
 from server.apps.shortify.application.exceptions import (
@@ -43,7 +43,7 @@ class ShortLinkView(HasContainer, Controller[MsgspecSerializer]):
     )
     def post(
         self,
-        parsed_body: Body[ShortLinkCreateSchema],
+        parsed_body: BodyMsgspec[ShortLinkCreateSchema],
     ) -> ShortLinkResponseSchema:
         """Create short link"""
 
@@ -84,6 +84,7 @@ class ShortLinkView(HasContainer, Controller[MsgspecSerializer]):
 @final
 class RedirectView(HasContainer, Controller[MsgspecSerializer]):
     description = 'Redirect Controller'
+    auth = None
 
     @modify(
         extra_responses=[

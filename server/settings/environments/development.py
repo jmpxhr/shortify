@@ -6,7 +6,10 @@ from server.settings.components.common import (
     INSTALLED_APPS,
     MIDDLEWARE,
 )
-from server.settings.components.cors import CORS_ALLOWED_ORIGINS
+from server.settings.components.cors import (
+    CORS_ALLOWED_ORIGINS,
+    CSRF_TRUSTED_ORIGINS,
+)
 
 # Setting the development status:
 
@@ -44,10 +47,14 @@ INTERNAL_IPS += ['127.0.0.1', '10.0.2.2']
 
 # django-cors-headers
 
-CORS_ALLOWED_ORIGINS.extend([
+_DEV_ORIGINS = [
     'http://localhost',
     'http://127.0.0.1',
-])
+    'http://localhost:3000',
+    'http://127.0.0.1:3000',
+]
+CORS_ALLOWED_ORIGINS.extend(_DEV_ORIGINS)
+CSRF_TRUSTED_ORIGINS.extend(_DEV_ORIGINS)
 
 # Disable persistent DB connections
 # https://docs.djangoproject.com/en/6.0/ref/databases/#caveats

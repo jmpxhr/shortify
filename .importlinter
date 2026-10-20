@@ -63,3 +63,14 @@ protected_modules =
 
 allowed_importers =
   server.settings
+
+
+[importlinter:contract:ioc-providers-are-private]
+name = IoC providers can be imported only by `server.ioc`
+type = protected
+
+protected_modules =
+  server.ioc.providers
+
+allowed_importers =
+  server.ioc
