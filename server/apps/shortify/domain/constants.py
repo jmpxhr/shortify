@@ -2,6 +2,7 @@ import string
 from typing import Final
 
 ORIGINAL_URL_MAX_LENGTH: Final = 200
+ORIGINAL_URL_PATTERN: Final = '^https?://'
 SHORT_URL_MAX_LENGTH: Final = 10
 SHORT_CODE_LENGTH: Final = 6
 SHORT_CODE_MAX_ATTEMPTS: Final = 5
