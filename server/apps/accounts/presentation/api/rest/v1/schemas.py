@@ -21,6 +21,7 @@ class SignUpSchema(msgspec.Struct):
             min_length=1,
             max_length=USERNAME_MAX_LENGTH,
             pattern=USERNAME_PATTERN,
+            examples=['johndoe'],
         ),
     ]
     email: Annotated[
@@ -29,6 +30,7 @@ class SignUpSchema(msgspec.Struct):
             min_length=1,
             max_length=EMAIL_MAX_LENGTH,
             pattern=EMAIL_PATTERN,
+            examples=['john.doe@example.com'],
         ),
     ]
     password: Annotated[
@@ -36,6 +38,7 @@ class SignUpSchema(msgspec.Struct):
         msgspec.Meta(
             min_length=PASSWORD_MIN_LENGTH,
             max_length=PASSWORD_MAX_LENGTH,
+            examples=['strong-password-123'],
         ),
     ]
 
@@ -49,6 +52,6 @@ class ObtainTokensPayload(_DmrObtainTokensPayload):
 class UserResponseSchema(msgspec.Struct):
     """Schema for a user API response."""
 
-    id: int
-    username: str
-    email: str
+    id: Annotated[int, msgspec.Meta(examples=[1])]
+    username: Annotated[str, msgspec.Meta(examples=['johndoe'])]
+    email: Annotated[str, msgspec.Meta(examples=['john.doe@example.com'])]

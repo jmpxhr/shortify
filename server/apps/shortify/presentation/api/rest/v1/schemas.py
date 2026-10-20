@@ -29,8 +29,16 @@ class ShortLinkCreateSchema(msgspec.Struct):
 class ShortLinkResponseSchema(msgspec.Struct):
     """Schema for a short link API response."""
 
-    original_url: str
-    short_code: str
+    original_url: Annotated[
+        str,
+        msgspec.Meta(
+            examples=['https://github.com/wemake-services/wemake-django-template'],
+        ),
+    ]
+    short_code: Annotated[
+        str,
+        msgspec.Meta(examples=['aB3xY9']),
+    ]
 
 
 @final
