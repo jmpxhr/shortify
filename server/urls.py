@@ -24,17 +24,16 @@ from dmr.openapi import build_schema
 from dmr.openapi.views import OpenAPIJsonView, SwaggerView
 from dmr.plugins.msgspec import MsgspecSerializer
 from dmr.routing import Router, build_404_handler, build_500_handler
+from dmr.security.csrf import build_csrf_handler
 
-from server.apps.accounts.presentation.api.rest.v1.urls import (
-    router as auth_router,
-)
+from server.apps.accounts.presentation.api.rest.v1.urls import router as accounts_router
 from server.apps.shortify.presentation.api.rest.v1.urls import router as shortify_router
 
 admin.autodiscover()
 
 router_v1 = Router('v1/')
 router_v1.include(shortify_router)
-router_v1.include(auth_router)
+router_v1.include(accounts_router)
 
 router = Router('api/')
 router.include(router_v1, namespace='v1')
@@ -43,6 +42,7 @@ schema = build_schema(router)
 
 handler404 = build_404_handler(router.prefix, serializer=MsgspecSerializer)
 handler500 = build_500_handler(router.prefix, serializer=MsgspecSerializer)
+csrf_handler = build_csrf_handler(router.prefix, serializer=MsgspecSerializer)
 
 urlpatterns = [
     # API:
