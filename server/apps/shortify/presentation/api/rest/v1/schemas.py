@@ -2,7 +2,11 @@ from typing import Annotated, final
 
 import msgspec
 
-from server.apps.shortify.domain.constants import ORIGINAL_URL_MAX_LENGTH
+from server.apps.shortify.domain.constants import (
+    ORIGINAL_URL_MAX_LENGTH,
+    SHORT_CODE_PATTERN,
+    SHORT_URL_MAX_LENGTH,
+)
 
 
 @final
@@ -30,4 +34,10 @@ class ShortLinkResponseSchema(msgspec.Struct):
 
 @final
 class ShortLinkPath(msgspec.Struct):
-    short_code: str
+    short_code: Annotated[
+        str,
+        msgspec.Meta(
+            max_length=SHORT_URL_MAX_LENGTH,
+            pattern=SHORT_CODE_PATTERN,
+        ),
+    ]
