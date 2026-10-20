@@ -112,10 +112,41 @@ def _inject_shortify(container: punq.Container) -> None:
     _inject_use_cases(container, inject=inject)
 
 
+def _inject_accounts(container: punq.Container) -> None:
+    from server.apps.accounts.application.interfaces.mappers import (
+        EntityDtoUserMapperProtocol,
+    )
+    from server.apps.accounts.application.interfaces.repositories import (
+        UserRepositoryProtocol,
+    )
+    from server.apps.accounts.application.interfaces.services import (
+        PasswordValidatorProtocol,
+    )
+    from server.apps.accounts.application.mappers import UserMapper
+    from server.apps.accounts.application.use_cases import RegisterUser
+    from server.apps.accounts.infrastructure.mappers import UserDBMapper
+    from server.apps.accounts.infrastructure.repositories import DjangoUserRepository
+    from server.apps.accounts.infrastructure.services import DjangoPasswordValidator
+    from server.apps.accounts.presentation.api.rest.v1.mappers import (
+        UserPresentationMapper,
+    )
+
+    # Hacks to resolve annotations:
+    inject = _create_injector(container, locals())  # noqa: WPS421
+
+    container.register(UserPresentationMapper)
+    container.register(EntityDtoUserMapperProtocol, UserMapper)
+    container.register(UserDBMapper)
+    container.register(UserRepositoryProtocol, DjangoUserRepository)
+    container.register(PasswordValidatorProtocol, DjangoPasswordValidator)
+    container.register(inject(RegisterUser))
+
+
 def populate_dependencies(container: punq.Container) -> punq.Container:
     """Populates dependencies for the container."""
     # Deps:
     _inject_django(container)
     # Apps:
     _inject_shortify(container)
+    _inject_accounts(container)
     return container

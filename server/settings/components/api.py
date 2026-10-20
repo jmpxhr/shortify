@@ -2,8 +2,11 @@ import tomllib
 from typing import cast
 
 from dmr.openapi import OpenAPIConfig
+from dmr.plugins.msgspec import MsgspecSerializer
+from dmr.security.csrf import build_csrf_handler
 from dmr.settings import SettingsDict
 
+from server.common.security import jwt_cookie_auth
 from server.settings.components import BASE_DIR
 
 
@@ -20,8 +23,14 @@ def _get_project_meta() -> dict[str, str]:
 # https://django-modern-rest.readthedocs.io
 
 DMR_SETTINGS = SettingsDict(
+    auth=[jwt_cookie_auth],
     openapi_config=OpenAPIConfig(
         title='Django Shortify',
         version=_get_project_meta()['version'],
-    )
+    ),
+)
+
+CSRF_FAILURE_VIEW = build_csrf_handler(
+    'api/',
+    serializer=MsgspecSerializer,
 )

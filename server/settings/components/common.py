@@ -30,6 +30,7 @@ SECRET_KEY: Final = config(
 
 _APPS: list[str] = [
     'server.apps.shortify',
+    'server.apps.accounts',
 ]
 
 _DJANGO_APPS: list[str] = [
@@ -124,6 +125,17 @@ DEFAULT_AUTO_FIELD: Final = 'django.db.models.AutoField'
 
 AUTHENTICATION_BACKENDS: tuple[str] = ('django.contrib.auth.backends.ModelBackend',)
 
+# Password validation
+# https://docs.djangoproject.com/en/6.0/ref/settings/#auth-password-validators
+
+_PASS = 'django.contrib.auth.password_validation'  # ruff: ignore[hardcoded-password-string]
+AUTH_PASSWORD_VALIDATORS = [
+    {'NAME': f'{_PASS}.UserAttributeSimilarityValidator'},
+    {'NAME': f'{_PASS}.MinimumLengthValidator'},
+    {'NAME': f'{_PASS}.CommonPasswordValidator'},
+    {'NAME': f'{_PASS}.NumericPasswordValidator'},
+]
+
 PASSWORD_HASHERS: list[str] = [
     # 'django.contrib.auth.hashers.Argon2PasswordHasher',
     'django.contrib.auth.hashers.PBKDF2PasswordHasher',
@@ -134,7 +146,7 @@ PASSWORD_HASHERS: list[str] = [
 # https://docs.djangoproject.com/en/6.0/topics/security/
 
 SESSION_COOKIE_HTTPONLY = True
-CSRF_COOKIE_HTTPONLY = True
+CSRF_COOKIE_HTTPONLY = False
 SECURE_CONTENT_TYPE_NOSNIFF = True
 SECURE_BROWSER_XSS_FILTER = True
 

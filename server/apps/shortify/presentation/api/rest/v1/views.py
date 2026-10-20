@@ -84,6 +84,7 @@ class ShortLinkView(HasContainer, Controller[MsgspecSerializer]):
 @final
 class RedirectView(HasContainer, Controller[MsgspecSerializer]):
     description = 'Redirect Controller'
+    auth = None
 
     @modify(
         extra_responses=[

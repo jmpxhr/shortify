@@ -25,12 +25,16 @@ from dmr.openapi.views import OpenAPIJsonView, SwaggerView
 from dmr.plugins.msgspec import MsgspecSerializer
 from dmr.routing import Router, build_404_handler, build_500_handler
 
+from server.apps.accounts.presentation.api.rest.v1.urls import (
+    router as auth_router,
+)
 from server.apps.shortify.presentation.api.rest.v1.urls import router as shortify_router
 
 admin.autodiscover()
 
 router_v1 = Router('v1/')
 router_v1.include(shortify_router)
+router_v1.include(auth_router)
 
 router = Router('api/')
 router.include(router_v1, namespace='v1')
@@ -64,7 +68,7 @@ urlpatterns = [
     ),
 ]
 
-if settings.DEBUG:
+if settings.DEBUG and 'debug_toolbar' in settings.INSTALLED_APPS:
     import debug_toolbar
     from django.conf.urls.static import static
 
