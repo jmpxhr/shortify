@@ -1,6 +1,7 @@
 from typing import Annotated, final
 
 import msgspec
+from dmr.security.jwt.views import ObtainTokensPayload as _DmrObtainTokensPayload
 
 from server.apps.accounts.domain.constants import (
     EMAIL_MAX_LENGTH,
@@ -37,6 +38,11 @@ class SignUpSchema(msgspec.Struct):
             max_length=PASSWORD_MAX_LENGTH,
         ),
     ]
+
+
+@final
+class ObtainTokensPayload(_DmrObtainTokensPayload):
+    """Schema for a login API request."""
 
 
 @final

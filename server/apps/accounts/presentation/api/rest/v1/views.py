@@ -17,10 +17,7 @@ from dmr.security.jwt.views import (
     CookieLogoutSyncController,
     CookieObtainTokensSyncController,
     CookieRefreshTokensSyncController,
-    ObtainTokensPayload,
 )
-from dmr.throttling import Rate, SyncThrottle
-from dmr.throttling.cache_keys import RemoteAddr
 
 from server.apps.accounts.application import use_cases
 from server.apps.accounts.application.exceptions import (
@@ -32,17 +29,12 @@ from server.apps.accounts.presentation.api.rest.v1.mappers import (
     UserPresentationMapper,
 )
 from server.apps.accounts.presentation.api.rest.v1.schemas import (
+    ObtainTokensPayload,
     SignUpSchema,
     UserResponseSchema,
 )
 from server.common.di import HasContainer
-from server.common.security import JWTCookieSettings, jwt_cookie_auth
-
-_REFRESH_THROTTLE = SyncThrottle(
-    10,
-    Rate.minute,
-    cache_key=RemoteAddr(),
-)
+from server.common.security import JWTCookieSettings
 
 
 class _ConfiguredJWTCookieSettings(JWTCookieSettings):
@@ -70,9 +62,6 @@ class SignUpView(HasContainer, Controller[MsgspecSerializer]):
                 Controller.error_model,
                 status_code=HTTPStatus.CONFLICT,
             ),
-        ],
-        throttling=[
-            SyncThrottle(5, Rate.minute, cache_key=RemoteAddr()),
         ],
     )
     def post(self, parsed_body: BodyMsgspec[SignUpSchema]) -> UserResponseSchema:
@@ -129,8 +118,11 @@ class LoginView(
         self,
         payload: ObtainTokensPayload,
     ) -> ObtainTokensPayload:
-        """Use the default username and password payload."""
-        return payload
+        """Convert the login schema to Django's credentials payload."""
+        return {
+            'username': payload['username'],
+            'password': payload['password'],
+        }
 
 
 @final
@@ -142,14 +134,12 @@ class RefreshView(
 
     auth = None
     description = 'Refresh the JWT cookies.'
-    throttling = (_REFRESH_THROTTLE,)
 
 
 @final
 class VerifyView(Controller[MsgspecSerializer]):
     """Check that the access token cookie is still valid."""
 
-    auth = (jwt_cookie_auth,)
     description = 'Verify the current access token.'
 
     @modify(
