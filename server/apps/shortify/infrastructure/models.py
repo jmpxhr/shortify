@@ -19,7 +19,9 @@ class ShortLink(models.Model):
         max_length=ORIGINAL_URL_MAX_LENGTH,
     )
     short_code = models.CharField(
-        verbose_name='Short URL code', max_length=SHORT_URL_MAX_LENGTH
+        verbose_name='Short URL code',
+        max_length=SHORT_URL_MAX_LENGTH,
+        unique=True,
     )
 
     created_at = models.DateTimeField(
@@ -37,10 +39,7 @@ class ShortLink(models.Model):
         verbose_name = 'Short link'
         verbose_name_plural = 'Short links'
         ordering = ('-created_at',)
-        indexes = (
-            models.Index(fields=['short_code']),
-            models.Index(fields=['-created_at']),
-        )
+        indexes = (models.Index(fields=['-created_at']),)
 
     @override
     def __str__(self) -> str:

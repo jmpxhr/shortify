@@ -10,6 +10,7 @@ from server.apps.shortify.application.exceptions import ShortLinkCollisionError
 from server.apps.shortify.application.interfaces.repositories import (
     ShortLinkRepositoryProtocol,
 )
+from server.apps.shortify.application.interfaces.transactions import TransactionProtocol
 from server.apps.shortify.domain.entities import ShortLinkEntity
 from server.apps.shortify.infrastructure.models import ShortLink
 
@@ -21,13 +22,15 @@ if TYPE_CHECKING:
 @dataclass(frozen=True, slots=True)
 class ShortLinkRepository(ShortLinkRepositoryProtocol):
     _mapper: ShortLinkDBMapper
+    _transaction: TransactionProtocol
 
     @override
     def create(self, *, original_url: str, short_code: str) -> ShortLinkEntity:
         try:
-            short_link_instance = ShortLink.objects.create(
-                original_url=original_url, short_code=short_code
-            )
+            with self._transaction():
+                short_link_instance = ShortLink.objects.create(
+                    original_url=original_url, short_code=short_code
+                )
         except IntegrityError as exc:
             raise ShortLinkCollisionError(short_code) from exc
         return self._mapper.single(link=short_link_instance)

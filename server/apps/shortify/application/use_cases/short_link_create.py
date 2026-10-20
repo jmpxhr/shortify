@@ -4,7 +4,11 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING, final
 
 from server.apps.shortify.application.dtos.short_link import ShortLinkDTO
-from server.apps.shortify.domain.constants import SHORT_CODE_LENGTH
+from server.apps.shortify.application.exceptions import ShortLinkCollisionError
+from server.apps.shortify.domain.constants import (
+    SHORT_CODE_LENGTH,
+    SHORT_CODE_MAX_ATTEMPTS,
+)
 
 if TYPE_CHECKING:
     from server.apps.shortify.application.interfaces.mappers import (
@@ -18,7 +22,6 @@ if TYPE_CHECKING:
     )
 
 
-# TODO: retries for collision
 @final
 @dataclass(frozen=True, slots=True)
 class CreateShortLink:
@@ -27,8 +30,14 @@ class CreateShortLink:
     _service: ShortLinkGeneratorServiceProtocol
 
     def __call__(self, *, original_url: str) -> ShortLinkDTO:
-        short_code = self._service.generate_code(length=SHORT_CODE_LENGTH)
-        short_link_entity = self._repository.create(
-            original_url=original_url, short_code=short_code
-        )
-        return self._mapper.to_dto(short_link_entity)
+        short_code = ''
+        for _ in range(SHORT_CODE_MAX_ATTEMPTS):
+            short_code = self._service.generate_code(length=SHORT_CODE_LENGTH)
+            try:
+                short_link_entity = self._repository.create(
+                    original_url=original_url, short_code=short_code
+                )
+            except ShortLinkCollisionError:
+                continue
+            return self._mapper.to_dto(short_link_entity)
+        raise ShortLinkCollisionError(short_code)
