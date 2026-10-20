@@ -2,7 +2,9 @@ from dataclasses import dataclass
 from typing import final, override
 
 from django.contrib.auth.models import User
-from django.contrib.auth.password_validation import validate_password
+from django.contrib.auth.password_validation import (
+    validate_password as _validate_password,
+)
 from django.core.exceptions import ValidationError
 
 from server.apps.accounts.application.exceptions import WeakPasswordError
@@ -24,6 +26,6 @@ class DjangoPasswordValidator(PasswordValidatorProtocol):
     ) -> None:
         user = User(username=username, email=email)
         try:
-            validate_password(password, user=user)
+            _validate_password(password, user=user)
         except ValidationError as exc:
             raise WeakPasswordError(exc.messages) from exc
