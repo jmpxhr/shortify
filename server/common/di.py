@@ -19,7 +19,7 @@ class HasContainer:
         # Imported lazily so `server.common` does not statically depend on
         # the project-wide DI bootstrap. This also preserves Import Linter
         # app-independence checks.
-        implemented = importlib.import_module('server.implemented')
+        implemented = importlib.import_module('server.ioc')
         self._container = implemented.populate_dependencies(punq.Container())
 
     @final

@@ -111,7 +111,7 @@ pydocstyle.convention = "google"
 
 [tool.ruff.lint.per-file-ignores]
 "server/apps/*/migrations/*.py" = ["mutable-class-default"]
-"server/implemented.py" = ["import-outside-top-level", "unused-import"]
+"server/ioc/**/*.py" = ["import-outside-top-level", "unused-import"]
 "tests/**/*.py" = ["assert"]
 
 [tool.mypy]

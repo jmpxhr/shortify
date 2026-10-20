@@ -9,9 +9,7 @@ if TYPE_CHECKING:
     from server.apps.shortify.application.interfaces.repositories import (
         ShortLinkRepositoryProtocol,
     )
-    from server.apps.shortify.application.interfaces.transactions import (
-        TransactionProtocol,
-    )
+    from server.common.transaction import TransactionProtocol
 
 
 @final

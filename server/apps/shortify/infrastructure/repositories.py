@@ -10,12 +10,12 @@ from server.apps.shortify.application.exceptions import ShortLinkCollisionError
 from server.apps.shortify.application.interfaces.repositories import (
     ShortLinkRepositoryProtocol,
 )
-from server.apps.shortify.application.interfaces.transactions import TransactionProtocol
 from server.apps.shortify.domain.entities import ShortLinkEntity
 from server.apps.shortify.infrastructure.models import ShortLink
 
 if TYPE_CHECKING:
     from server.apps.shortify.infrastructure.mappers import ShortLinkDBMapper
+    from server.common.transaction import TransactionProtocol
 
 
 @final
