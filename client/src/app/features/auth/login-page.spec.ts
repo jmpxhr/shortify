@@ -80,6 +80,20 @@ describe('LoginPage', () => {
     expect(fixture.nativeElement.textContent).toContain('Invalid username or password.');
   });
 
+  it('returns to the requested page after login', async () => {
+    vi.spyOn(router, 'url', 'get').mockReturnValue('/login?returnUrl=%2Flinks%3Fpage%3D2');
+
+    const fixture = TestBed.createComponent(LoginPage);
+    const component = fixture.componentInstance;
+    component.model.set({ username: 'alice', password: 'secret' });
+    fixture.detectChanges();
+
+    submitForm(fixture.nativeElement as HTMLElement);
+    await settle();
+
+    expect(router.navigateByUrl).toHaveBeenCalledWith('/links?page=2');
+  });
+
   it('toggles password visibility', () => {
     const fixture = TestBed.createComponent(LoginPage);
     fixture.detectChanges();
