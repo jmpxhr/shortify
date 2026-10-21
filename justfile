@@ -102,3 +102,23 @@ migrate *args='':
 [group('db')]
 make-migrations *args='':
     uv run manage.py makemigrations {{ args }}
+
+# Start the Angular dev server
+[group('client')]
+client-dev:
+    bun --cwd client run start
+
+# Build the Angular client
+[group('client')]
+client-build:
+    bun --cwd client run build
+
+# Run Angular unit tests
+[group('client')]
+client-test:
+    bun --cwd client run test
+
+# Lint the Angular client
+[group('client')]
+client-lint:
+    bun --cwd client run lint

@@ -1,0 +1,76 @@
+<section class="page">
+  <a class="back-link" routerLink="/links">← Back to links</a>
+
+  @if (loading()) {
+    <div class="stack-sm" role="status">
+      <span class="sr-only">Loading link details</span>
+      <div class="skeleton detail-skeleton detail-skeleton--title" aria-hidden="true"></div>
+      <div class="skeleton detail-skeleton" aria-hidden="true"></div>
+      <div class="skeleton detail-skeleton" aria-hidden="true"></div>
+    </div>
+  } @else if (notFound()) {
+    <div class="card empty-state">
+      <h1>Link not found</h1>
+      <p>This link may have been deleted or never existed.</p>
+      <p class="detail-actions">
+        <a class="btn" routerLink="/links">Back to links</a>
+      </p>
+    </div>
+  } @else if (errorMessage(); as message) {
+    <app-error-banner [message]="message" (retry)="retry()" />
+  } @else if (link(); as link) {
+    <header class="page-header detail-header">
+      <div>
+        <p class="muted detail-eyebrow">Short link</p>
+        <h1 class="mono">{{ link.shortCode }}</h1>
+      </div>
+      <button class="btn btn-danger" type="button" (click)="requestDelete()">Delete link</button>
+    </header>
+
+    <div class="detail-grid">
+      <section class="card detail-card" aria-labelledby="destination-heading">
+        <h2 id="destination-heading">Destination</h2>
+        <a class="detail-url" [href]="link.originalUrl" target="_blank" rel="noopener noreferrer">
+          {{ link.originalUrl }}
+        </a>
+      </section>
+
+      <section class="card detail-card" aria-labelledby="short-url-heading">
+        <h2 id="short-url-heading">Short URL</h2>
+        <div class="detail-short">
+          <a
+            class="detail-url mono"
+            [href]="shortUrl(link.shortCode)"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            {{ shortUrl(link.shortCode) }}
+          </a>
+          <app-copy-button
+            [text]="shortUrl(link.shortCode)"
+            [label]="'Copy short link ' + link.shortCode"
+          />
+        </div>
+      </section>
+
+      <dl class="detail-stats">
+        <div class="card detail-stat">
+          <dt>Clicks</dt>
+          <dd>{{ link.clicks }}</dd>
+        </div>
+        <div class="card detail-stat">
+          <dt>Created</dt>
+          <dd>{{ link.createdAt | date: 'medium' }}</dd>
+        </div>
+      </dl>
+    </div>
+  }
+
+  <app-confirm-dialog
+    title="Delete link?"
+    [message]="deleteMessage()"
+    confirmLabel="Delete link"
+    (confirmed)="confirmDelete()"
+    (cancelled)="onDeleteCancelled()"
+  />
+</section>

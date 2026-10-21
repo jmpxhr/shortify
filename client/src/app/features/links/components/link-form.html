@@ -1,0 +1,40 @@
+<form class="card link-form" novalidate (submit)="submit($event)">
+  <div class="link-form__heading">
+    <h2>Shorten a link</h2>
+    <p class="muted">Paste a long URL and get a compact, shareable link.</p>
+  </div>
+
+  @if (error(); as message) {
+    <app-error-banner [message]="message" />
+  }
+
+  <div class="link-form__row">
+    <div class="field link-form__field">
+      <label for="original-url">Long URL</label>
+      <input
+        id="original-url"
+        type="url"
+        inputmode="url"
+        autocomplete="url"
+        placeholder="https://example.com/a/very/long/path"
+        [formField]="linkForm.originalUrl"
+        [attr.aria-invalid]="urlError() ? true : null"
+        [attr.aria-describedby]="urlError() ? 'original-url-error' : 'original-url-hint'"
+      />
+      @if (urlError()) {
+        <p id="original-url-error" class="field__error">{{ urlError() }}</p>
+      } @else {
+        <p id="original-url-hint" class="field__hint">Maximum 200 characters.</p>
+      }
+    </div>
+
+    <button class="btn btn-primary link-form__submit" type="submit" [disabled]="submitting()">
+      @if (submitting()) {
+        <span class="spinner" aria-hidden="true"></span>
+        Creating…
+      } @else {
+        Shorten
+      }
+    </button>
+  </div>
+</form>

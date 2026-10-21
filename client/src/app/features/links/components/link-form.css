@@ -1,0 +1,45 @@
+.link-form {
+  display: grid;
+  gap: var(--space-4);
+  padding: var(--space-5);
+}
+
+.link-form__heading h2 {
+  font-size: 1.1rem;
+}
+
+.link-form__heading p {
+  margin-block-start: var(--space-1);
+  font-size: 0.92rem;
+}
+
+.link-form__row {
+  display: flex;
+  align-items: start;
+  gap: var(--space-3);
+}
+
+.link-form__field {
+  flex: 1;
+}
+
+.link-form__submit {
+  margin-block-start: 1.65rem;
+  min-height: 2.8rem;
+  white-space: nowrap;
+}
+
+@media (max-width: 40rem) {
+  .link-form__row {
+    flex-direction: column;
+  }
+
+  .link-form__field,
+  .link-form__submit {
+    width: 100%;
+  }
+
+  .link-form__submit {
+    margin-block-start: 0;
+  }
+}

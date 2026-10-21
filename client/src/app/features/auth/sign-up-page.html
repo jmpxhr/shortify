@@ -1,0 +1,86 @@
+<section class="auth-shell">
+  <div class="card auth-card">
+    <header class="auth-card__header">
+      <h1>Create your account</h1>
+      <p>Start shortening links in a few seconds.</p>
+    </header>
+
+    <form class="stack" novalidate (submit)="submit($event)">
+      @if (errorMessage(); as message) {
+        <app-error-banner [message]="message" />
+      }
+
+      <div class="field">
+        <label for="username">Username</label>
+        <input
+          id="username"
+          type="text"
+          autocomplete="username"
+          [formField]="signUpForm.username"
+          [attr.aria-invalid]="usernameError() ? true : null"
+          [attr.aria-describedby]="usernameError() ? 'username-error' : null"
+        />
+        @if (usernameError()) {
+          <p id="username-error" class="field__error">{{ usernameError() }}</p>
+        }
+      </div>
+
+      <div class="field">
+        <label for="email">Email</label>
+        <input
+          id="email"
+          type="email"
+          autocomplete="email"
+          [formField]="signUpForm.email"
+          [attr.aria-invalid]="emailError() ? true : null"
+          [attr.aria-describedby]="emailError() ? 'email-error' : null"
+        />
+        @if (emailError()) {
+          <p id="email-error" class="field__error">{{ emailError() }}</p>
+        }
+      </div>
+
+      <div class="field">
+        <label for="password">Password</label>
+        <div class="password-field">
+          <input
+            id="password"
+            [type]="showPassword() ? 'text' : 'password'"
+            autocomplete="new-password"
+            [formField]="signUpForm.password"
+            [attr.aria-invalid]="passwordError() ? true : null"
+            [attr.aria-describedby]="passwordError() ? 'password-error' : 'password-hint'"
+          />
+          <button
+            class="btn btn-ghost btn-sm"
+            type="button"
+            [attr.aria-pressed]="showPassword()"
+            [attr.aria-label]="showPassword() ? 'Hide password' : 'Show password'"
+            (click)="togglePassword()"
+          >
+            {{ showPassword() ? 'Hide' : 'Show' }}
+          </button>
+        </div>
+        @if (passwordError()) {
+          <p id="password-error" class="field__error">{{ passwordError() }}</p>
+        } @else {
+          <p id="password-hint" class="field__hint">Use at least 8 characters.</p>
+        }
+      </div>
+
+      <button class="btn btn-primary btn-block" type="submit" [disabled]="submitting()">
+        @if (submitting()) {
+          <span class="spinner" aria-hidden="true"></span>
+          Creating account…
+        } @else {
+          Create account
+        }
+      </button>
+    </form>
+
+    <p class="auth-card__footer">
+      Already have an account?
+      <a routerLink="/login">Sign in</a>
+    </p>
+  </div>
+</section>

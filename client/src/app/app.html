@@ -1,0 +1,25 @@
+<a class="skip-link" href="#main-content">Skip to content</a>
+
+<header class="site-header">
+  <div class="site-header__inner">
+    <a class="brand" routerLink="/links" aria-label="Shortify home">
+      <span class="brand__mark" aria-hidden="true">S</span>
+      <span>Shortify</span>
+    </a>
+
+    @if (auth.isAuthenticated()) {
+      <nav class="site-nav" aria-label="Main">
+        <a routerLink="/links" routerLinkActive="is-active">Links</a>
+      </nav>
+
+      <div class="user-menu">
+        <span class="user-menu__name">{{ auth.user()?.username }}</span>
+        <button class="btn btn-ghost btn-sm" type="button" (click)="logout()">Log out</button>
+      </div>
+    }
+  </div>
+</header>
+
+<main id="main-content" tabindex="-1">
+  <router-outlet />
+</main>
