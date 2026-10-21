@@ -14,7 +14,12 @@ export class App {
   private readonly router = inject(Router);
 
   protected async logout(): Promise<void> {
-    await this.auth.logout();
-    await this.router.navigate(['/login']);
+    try {
+      await this.auth.logout();
+    } catch {
+      // Local session state is cleared even when the server request fails.
+    } finally {
+      await this.router.navigate(['/login']);
+    }
   }
 }
