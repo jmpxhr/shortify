@@ -34,6 +34,24 @@ services:
     expose:
       - "8000"
 
+  nginx:
+    build:
+      context: .
+      dockerfile: ./docker/nginx/Dockerfile
+    restart: unless-stopped
+    logging: *logging-production
+    depends_on:
+      - web
+    volumes:
+      # Shared with the `web` service, nginx only reads them:
+      - django-static:/var/www/django/static:ro
+      - django-media:/var/www/django/media:ro
+    networks:
+      - proxy-net
+    ports:
+      # The only public entrypoint of the application:
+      - "80:80"
+
 
 networks:
   # Network for your proxy server and application to connect them,
@@ -43,5 +61,3 @@ networks:
 volumes:
   django-media:
   django-locale:
-  caddy-config:
-  caddy-data:
