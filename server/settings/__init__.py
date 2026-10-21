@@ -8,7 +8,7 @@ To change settings file:
 from os import environ
 
 import django_stubs_ext
-from split_settings.tools import include, optional
+from split_settings.tools import include
 
 # Monkeypatching Django, so stubs will work for all generics,
 # see: https://github.com/typeddjango/django-stubs
@@ -26,7 +26,6 @@ _base_settings = (
     # Select the right env:
     f'environments/{_ENV}.py',
     # Optionally override some settings:
-    optional('environments/local.py'),
 )
 
 # Include settings:
