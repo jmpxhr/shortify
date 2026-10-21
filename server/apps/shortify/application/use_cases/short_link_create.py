@@ -29,13 +29,15 @@ class CreateShortLink:
     _repository: ShortLinkRepositoryProtocol
     _service: ShortLinkGeneratorServiceProtocol
 
-    def __call__(self, *, original_url: str) -> ShortLinkDTO:
+    def __call__(self, *, original_url: str, owner_id: int) -> ShortLinkDTO:
         short_code = ''
         for _ in range(SHORT_CODE_MAX_ATTEMPTS):
             short_code = self._service.generate_code(length=SHORT_CODE_LENGTH)
             try:
                 short_link_entity = self._repository.create(
-                    original_url=original_url, short_code=short_code
+                    original_url=original_url,
+                    short_code=short_code,
+                    owner_id=owner_id,
                 )
             except ShortLinkCollisionError:
                 continue

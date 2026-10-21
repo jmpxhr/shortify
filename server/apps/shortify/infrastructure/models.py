@@ -1,5 +1,6 @@
 from typing import TYPE_CHECKING, ClassVar, Self, override
 
+from django.conf import settings
 from django.db import models
 
 from server.apps.shortify.domain.constants import (
@@ -31,6 +32,14 @@ class ShortLink(models.Model):
     clicks = models.PositiveIntegerField(
         verbose_name='clicks count',
         default=0,
+    )
+    owner = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        verbose_name='owner',
+        on_delete=models.CASCADE,
+        related_name='short_links',
+        null=True,
+        blank=True,
     )
 
     objects: ClassVar[models.Manager[Self]]  # noqa: WPS110

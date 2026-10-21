@@ -34,10 +34,12 @@ class ShortLinkAdmin(admin.ModelAdmin[ShortLink]):
         'short_code_link',
         'original_url_truncated',
         'clicks',
+        'owner',
         'created_at',
     )
-    list_filter = ('created_at',)
-    search_fields = ('short_code', 'original_url')
+    list_filter = ('created_at', 'owner')
+    search_fields = ('short_code', 'original_url', 'owner__username')
+    list_select_related = ('owner',)
     readonly_fields = ('created_at', 'clicks', 'full_short_url')
 
     fieldsets = (
@@ -48,6 +50,7 @@ class ShortLinkAdmin(admin.ModelAdmin[ShortLink]):
                     'short_code',
                     'original_url',
                     'clicks',
+                    'owner',
                 ],
             },
         ),

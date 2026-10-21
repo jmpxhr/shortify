@@ -25,11 +25,19 @@ class ShortLinkRepository(ShortLinkRepositoryProtocol):
     _transaction: TransactionProtocol
 
     @override
-    def create(self, *, original_url: str, short_code: str) -> ShortLinkEntity:
+    def create(
+        self,
+        *,
+        original_url: str,
+        short_code: str,
+        owner_id: int,
+    ) -> ShortLinkEntity:
         try:
             with self._transaction():
                 short_link_instance = ShortLink.objects.create(
-                    original_url=original_url, short_code=short_code
+                    original_url=original_url,
+                    short_code=short_code,
+                    owner_id=owner_id,
                 )
         except IntegrityError as exc:
             raise ShortLinkCollisionError(short_code) from exc

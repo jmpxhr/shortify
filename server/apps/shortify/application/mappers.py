@@ -18,4 +18,5 @@ class ShortLinkMapper(EntityDtoShortLinkMapperProtocol):
             short_code=entity.short_code,
             created_at=entity.created_at,
             clicks=entity.clicks,
+            owner_id=entity.owner_id,
         )

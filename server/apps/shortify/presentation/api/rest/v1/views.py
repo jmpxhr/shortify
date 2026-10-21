@@ -1,11 +1,13 @@
 from http import HTTPStatus
 from typing import final, override
 
+from django.contrib.auth.models import User
 from django.http import HttpResponse
 from dmr import Controller, HeaderSpec, Path, RedirectTo, ResponseSpec, modify
 from dmr.endpoint import Endpoint
 from dmr.errors import ErrorType
 from dmr.plugins.msgspec import BodyMsgspec, MsgspecSerializer
+from dmr.security import AuthenticatedHttpRequest
 
 from server.apps.shortify.application import use_cases
 from server.apps.shortify.application.exceptions import (
@@ -28,6 +30,7 @@ from server.common.di import HasContainer
 @final
 class ShortLinkView(HasContainer, Controller[MsgspecSerializer]):
     description = 'Short Link View'
+    request: AuthenticatedHttpRequest[User]  # pyrefly: ignore [bad-override-mutable-attribute]
 
     @modify(
         extra_responses=[
@@ -49,6 +52,7 @@ class ShortLinkView(HasContainer, Controller[MsgspecSerializer]):
 
         short_link_dto = self.resolve(use_cases.CreateShortLink)(
             original_url=parsed_body.original_url,
+            owner_id=self.request.user.pk,
         )
         return self.resolve(mappers.ShortLinkPresentationMapper)(
             short_link=short_link_dto

@@ -10,3 +10,4 @@ class ShortLinkDTO:
     short_code: str
     created_at: datetime
     clicks: int
+    owner_id: int | None = None
