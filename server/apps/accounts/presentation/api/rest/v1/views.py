@@ -2,16 +2,18 @@ from http import HTTPStatus
 from typing import final, override
 
 from django.conf import settings
+from django.contrib.auth.models import User
 from django.http import HttpResponse
 from django.views.decorators.debug import (
     sensitive_post_parameters,
     sensitive_variables,
 )
-from dmr import Controller, ResponseSpec, modify
+from dmr import Controller, NewCookie, ResponseSpec, modify
 from dmr.decorators import endpoint_decorator
 from dmr.endpoint import Endpoint
 from dmr.errors import ErrorType
 from dmr.plugins.msgspec import BodyMsgspec, MsgspecSerializer
+from dmr.security import AuthenticatedHttpRequest
 from dmr.security.base import NO_STORE_HEADERS
 from dmr.security.jwt.views import (
     CookieLogoutSyncController,
@@ -22,6 +24,7 @@ from dmr.security.jwt.views import (
 from server.apps.accounts.application import use_cases
 from server.apps.accounts.application.exceptions import (
     UserAlreadyExistsError,
+    UserNotFoundError,
     WeakPasswordError,
 )
 from server.apps.accounts.domain.exceptions import UserValidationError
@@ -32,6 +35,7 @@ from server.apps.accounts.presentation.api.rest.v1.schemas import (
     ObtainTokensPayload,
     SignUpSchema,
     UserResponseSchema,
+    UserUpdateSchema,
 )
 from server.common.di import HasContainer
 from server.common.security import JWTCookieSettings
@@ -90,6 +94,98 @@ class SignUpView(HasContainer, Controller[MsgspecSerializer]):
             )
 
         if isinstance(exc, (WeakPasswordError, UserValidationError)):
+            return self.to_error(
+                self.format_error(
+                    str(exc),
+                    error_type=ErrorType.user_msg,
+                ),
+                status_code=HTTPStatus.BAD_REQUEST,
+            )
+        return super().handle_error(endpoint, controller, exc)
+
+
+@final
+class CurrentUserView(HasContainer, Controller[MsgspecSerializer]):
+    """Read, update, or delete the authenticated user's profile."""
+
+    description = 'Current user profile.'
+    request: AuthenticatedHttpRequest[User]  # pyrefly: ignore [bad-override-mutable-attribute]
+
+    def get(self) -> UserResponseSchema:
+        """Return the current user's profile."""
+        user_dto = self.resolve(use_cases.GetCurrentUser)(
+            user_id=self.request.user.pk,
+        )
+        return self.resolve(UserPresentationMapper)(user=user_dto)
+
+    @modify(
+        extra_responses=[
+            ResponseSpec(
+                Controller.error_model,
+                status_code=HTTPStatus.BAD_REQUEST,
+            ),
+            ResponseSpec(
+                Controller.error_model,
+                status_code=HTTPStatus.CONFLICT,
+            ),
+        ],
+    )
+    def patch(self, parsed_body: BodyMsgspec[UserUpdateSchema]) -> UserResponseSchema:
+        """Update the current user's profile."""
+        user_dto = self.resolve(use_cases.UpdateCurrentUser)(
+            user_id=self.request.user.pk,
+            username=parsed_body.username,
+            email=parsed_body.email,
+        )
+        return self.resolve(UserPresentationMapper)(user=user_dto)
+
+    @modify(
+        status_code=HTTPStatus.NO_CONTENT,
+        cookies={
+            settings.ACCESS_COOKIE_NAME: NewCookie(
+                value='',
+                max_age=0,
+                path='/',
+            ),
+            settings.REFRESH_COOKIE_NAME: NewCookie(
+                value='',
+                max_age=0,
+                path=settings.REFRESH_COOKIE_PATH,
+            ),
+        },
+    )
+    def delete(self) -> None:
+        """Delete the current user's account."""
+        self.resolve(use_cases.DeleteCurrentUser)(
+            user_id=self.request.user.pk,
+        )
+
+    @override
+    def handle_error(
+        self,
+        endpoint: Endpoint,
+        controller: Controller[MsgspecSerializer],
+        exc: Exception,
+    ) -> HttpResponse:
+        if isinstance(exc, UserNotFoundError):
+            return self.to_error(
+                self.format_error(
+                    'User not found',
+                    error_type=ErrorType.not_found,
+                ),
+                status_code=HTTPStatus.NOT_FOUND,
+            )
+
+        if isinstance(exc, UserAlreadyExistsError):
+            return self.to_error(
+                self.format_error(
+                    'User with this username already exists',
+                    error_type=ErrorType.user_msg,
+                ),
+                status_code=HTTPStatus.CONFLICT,
+            )
+
+        if isinstance(exc, UserValidationError):
             return self.to_error(
                 self.format_error(
                     str(exc),

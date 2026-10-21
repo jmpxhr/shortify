@@ -12,6 +12,15 @@ class UserAlreadyExistsError(Exception):
 
 
 @final
+class UserNotFoundError(Exception):
+    """Raised when a user cannot be found."""
+
+    def __init__(self, user_id: int) -> None:
+        super().__init__(f'User not found: {user_id}')
+        self.user_id = user_id
+
+
+@final
 class WeakPasswordError(Exception):
     """Raised when the provided password fails validation."""
 

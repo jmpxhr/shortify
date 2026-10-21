@@ -44,6 +44,37 @@ class SignUpSchema(msgspec.Struct):
 
 
 @final
+class UserUpdateSchema(msgspec.Struct):
+    """Schema for a partial current-user update."""
+
+    username: (
+        Annotated[
+            str,
+            msgspec.Meta(
+                min_length=1,
+                max_length=USERNAME_MAX_LENGTH,
+                pattern=USERNAME_PATTERN,
+                examples=['johndoe'],
+            ),
+        ]
+        | None
+    ) = None
+
+    email: (
+        Annotated[
+            str,
+            msgspec.Meta(
+                min_length=1,
+                max_length=EMAIL_MAX_LENGTH,
+                pattern=EMAIL_PATTERN,
+                examples=['john.doe@example.com'],
+            ),
+        ]
+        | None
+    ) = None
+
+
+@final
 class ObtainTokensPayload(_DmrObtainTokensPayload):
     """Schema for a login API request."""
 

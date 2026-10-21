@@ -19,7 +19,12 @@ def inject_accounts(
         PasswordValidatorProtocol,
     )
     from server.apps.accounts.application.mappers import UserMapper
-    from server.apps.accounts.application.use_cases import RegisterUser
+    from server.apps.accounts.application.use_cases import (
+        DeleteCurrentUser,
+        GetCurrentUser,
+        RegisterUser,
+        UpdateCurrentUser,
+    )
     from server.apps.accounts.infrastructure.mappers import UserDBMapper
     from server.apps.accounts.infrastructure.repositories import DjangoUserRepository
     from server.apps.accounts.infrastructure.services import DjangoPasswordValidator
@@ -33,3 +38,6 @@ def inject_accounts(
     container.register(UserRepositoryProtocol, DjangoUserRepository)
     container.register(PasswordValidatorProtocol, DjangoPasswordValidator)
     container.register(inject(RegisterUser))
+    container.register(inject(GetCurrentUser))
+    container.register(inject(UpdateCurrentUser))
+    container.register(inject(DeleteCurrentUser))

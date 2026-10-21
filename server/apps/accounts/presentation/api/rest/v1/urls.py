@@ -1,6 +1,7 @@
 from dmr.routing import Router, path
 
 from server.apps.accounts.presentation.api.rest.v1.views import (
+    CurrentUserView,
     LoginView,
     LogoutView,
     RefreshView,
@@ -18,4 +19,12 @@ router = Router(
         path('logout/', LogoutView.as_view(), name='logout'),
     ],
     tags=['Auth'],
+)
+
+users_router = Router(
+    'users/',
+    urls=[
+        path('me/', CurrentUserView.as_view(), name='me'),
+    ],
+    tags=['Users'],
 )
