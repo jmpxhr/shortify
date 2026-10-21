@@ -49,7 +49,10 @@ class ShortLink(models.Model):
         verbose_name = 'Short link'
         verbose_name_plural = 'Short links'
         ordering = ('-created_at',)
-        indexes = (models.Index(fields=['-created_at']),)
+        indexes = (
+            models.Index(fields=['-created_at']),
+            models.Index(fields=['owner', '-created_at']),
+        )
 
     @override
     def __str__(self) -> str:

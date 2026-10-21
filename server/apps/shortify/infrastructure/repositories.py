@@ -52,6 +52,49 @@ class ShortLinkRepository(ShortLinkRepositoryProtocol):
         return self._mapper.single(link=short_link_instance)
 
     @override
+    def list_by_owner(
+        self,
+        *,
+        owner_id: int,
+        limit: int,
+        offset: int,
+    ) -> tuple[list[ShortLinkEntity], int]:
+        queryset = ShortLink.objects.filter(owner_id=owner_id)
+        total = queryset.count()
+        short_link_instances = queryset.order_by('-created_at', '-pk')[
+            offset : offset + limit
+        ]
+        return self._mapper.many(links=short_link_instances), total
+
+    @override
+    def get_by_code_and_owner(
+        self,
+        *,
+        short_code: str,
+        owner_id: int,
+    ) -> ShortLinkEntity | None:
+        short_link_instance = ShortLink.objects.filter(
+            short_code=short_code,
+            owner_id=owner_id,
+        ).first()
+        if short_link_instance is None:
+            return None
+        return self._mapper.single(link=short_link_instance)
+
+    @override
+    def delete_by_code_and_owner(
+        self,
+        *,
+        short_code: str,
+        owner_id: int,
+    ) -> bool:
+        deleted_count, _ = ShortLink.objects.filter(
+            short_code=short_code,
+            owner_id=owner_id,
+        ).delete()
+        return bool(deleted_count)
+
+    @override
     def increment_clicks(self, *, short_code: str) -> None:
         ShortLink.objects.filter(short_code=short_code).update(
             clicks=Field('clicks') + 1,

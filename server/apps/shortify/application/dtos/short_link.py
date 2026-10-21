@@ -11,3 +11,10 @@ class ShortLinkDTO:
     created_at: datetime
     clicks: int
     owner_id: int | None = None
+
+
+@final
+@dataclass(frozen=True, kw_only=True, slots=True)
+class ShortLinkPageDTO:
+    total: int
+    short_links: list[ShortLinkDTO]

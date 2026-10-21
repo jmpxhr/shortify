@@ -59,7 +59,10 @@ def _inject_use_cases(
     from server.apps.shortify.application import use_cases
 
     container.register(inject(use_cases.CreateShortLink))
+    container.register(inject(use_cases.DeleteShortLink))
+    container.register(inject(use_cases.GetShortLink))
     container.register(inject(use_cases.GetUrlFromShortLink))
+    container.register(inject(use_cases.ListShortLinks))
 
 
 def inject_shortify(

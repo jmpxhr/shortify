@@ -2,6 +2,7 @@ from dmr.routing import Router, path
 
 from server.apps.shortify.presentation.api.rest.v1.views import (
     RedirectView,
+    ShortLinkDetailView,
     ShortLinkView,
 )
 
@@ -19,6 +20,11 @@ _links_router = Router(
     'links/',
     urls=[
         path('', ShortLinkView.as_view(), name='create_link'),
+        path(
+            '<str:short_code>/',
+            ShortLinkDetailView.as_view(),
+            name='link_detail',
+        ),
     ],
     tags=['Links'],
 )
