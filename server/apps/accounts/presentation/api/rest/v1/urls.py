@@ -9,7 +9,7 @@ from server.apps.accounts.presentation.api.rest.v1.views import (
     VerifyView,
 )
 
-router = Router(
+accounts_router = Router(
     'auth/',
     urls=[
         path('sign-up/', SignUpView.as_view(), name='sign_up'),

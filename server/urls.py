@@ -26,9 +26,9 @@ from dmr.plugins.msgspec import MsgspecSerializer
 from dmr.routing import Router, build_404_handler, build_500_handler
 from dmr.security.csrf import build_csrf_handler
 
-from server.apps.accounts.presentation.api.rest.v1.urls import router as accounts_router
 from server.apps.accounts.presentation.api.rest.v1.urls import (
-    users_router as accounts_users_router,
+    accounts_router,
+    users_router,
 )
 from server.apps.shortify.presentation.api.rest.v1.urls import router as shortify_router
 
@@ -37,7 +37,7 @@ admin.autodiscover()
 router_v1 = Router('v1/')
 router_v1.include(shortify_router)
 router_v1.include(accounts_router)
-router_v1.include(accounts_users_router)
+router_v1.include(users_router)
 
 router = Router('api/')
 router.include(router_v1, namespace='v1')

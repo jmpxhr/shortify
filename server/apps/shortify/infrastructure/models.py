@@ -41,6 +41,7 @@ class ShortLink(models.Model):
         null=True,
         blank=True,
     )
+    owner_id: int
 
     objects: ClassVar[models.Manager[Self]]  # noqa: WPS110
 

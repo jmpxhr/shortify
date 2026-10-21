@@ -18,7 +18,7 @@ class ShortLinkDBMapper:
             short_code=link.short_code,
             created_at=link.created_at,
             clicks=link.clicks,
-            owner_id=link.owner_id,  # pyrefly: ignore [missing-attribute]
+            owner_id=link.owner_id,
         )
 
     def many(self, *, links: Iterable[ShortLink]) -> list[ShortLinkEntity]:
