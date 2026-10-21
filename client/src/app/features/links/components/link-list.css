@@ -1,0 +1,117 @@
+.link-list {
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.link-list__head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 5rem auto;
+  gap: var(--space-4);
+  padding: var(--space-3) var(--space-4);
+  border-block-end: 1px solid var(--color-border);
+  background: var(--color-surface-alt);
+  color: var(--color-muted);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.link-list__clicks {
+  text-align: end;
+}
+
+.link-list__items {
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.link-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 5rem auto;
+  gap: var(--space-4);
+  align-items: center;
+  padding: var(--space-4);
+  border-block-end: 1px solid var(--color-border);
+}
+
+.link-row:last-child {
+  border-block-end: 0;
+}
+
+.link-row__main {
+  display: grid;
+  min-width: 0;
+  gap: var(--space-1);
+}
+
+.link-row__code {
+  justify-self: start;
+  color: var(--color-primary);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.link-row__code:hover {
+  text-decoration: underline;
+}
+
+.link-row__url {
+  overflow: hidden;
+  color: var(--color-muted);
+  font-size: 0.9rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.link-row__clicks {
+  color: var(--color-muted);
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  text-align: end;
+}
+
+.link-row__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+@media (max-width: 48rem) {
+  .link-list__head {
+    display: none;
+  }
+
+  .link-row {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      'main main'
+      'clicks actions';
+    gap: var(--space-3);
+  }
+
+  .link-row__main {
+    grid-area: main;
+  }
+
+  .link-row__clicks {
+    grid-area: clicks;
+    justify-self: start;
+    text-align: start;
+  }
+
+  .link-row__clicks::before {
+    content: 'Clicks: ';
+  }
+
+  .link-row__actions {
+    grid-area: actions;
+    justify-self: end;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+}

@@ -1,0 +1,73 @@
+<section class="page">
+  <header class="page-header">
+    <div>
+      <h1>Your links</h1>
+      <p>Create short links, copy them anywhere, and keep an eye on clicks.</p>
+    </div>
+  </header>
+
+  <app-link-form
+    [error]="createError()"
+    [submitting]="creating()"
+    (createRequest)="createLink($event)"
+  />
+
+  @if (notice(); as message) {
+    <p class="alert alert--success links-page__notice" role="status">
+      {{ message }}
+    </p>
+  }
+
+  <section class="links-page__list" aria-labelledby="links-heading">
+    <div class="links-page__list-header">
+      <h2 id="links-heading">All links</h2>
+      <span class="muted">{{ totalCount() }} total</span>
+    </div>
+
+    @if (loading()) {
+      <div class="stack-sm" role="status">
+        <span class="sr-only">Loading links</span>
+        <div class="skeleton links-page__skeleton" aria-hidden="true"></div>
+        <div class="skeleton links-page__skeleton" aria-hidden="true"></div>
+        <div class="skeleton links-page__skeleton" aria-hidden="true"></div>
+      </div>
+    } @else if (listError(); as message) {
+      <app-error-banner [message]="message" (retry)="load()" />
+    } @else if (links().length === 0) {
+      <div class="card empty-state">
+        <h3>No links yet</h3>
+        <p>Shorten your first URL with the form above.</p>
+      </div>
+    } @else {
+      <app-link-list [links]="links()" (deleteRequest)="requestDelete($event)" />
+
+      <nav class="links-page__pagination" aria-label="Pagination">
+        <button
+          class="btn btn-sm"
+          type="button"
+          [disabled]="page() <= 1"
+          (click)="goToPage(page() - 1)"
+        >
+          Previous
+        </button>
+        <span class="muted">Page {{ page() }} of {{ totalPages() }}</span>
+        <button
+          class="btn btn-sm"
+          type="button"
+          [disabled]="page() >= totalPages()"
+          (click)="goToPage(page() + 1)"
+        >
+          Next
+        </button>
+      </nav>
+    }
+  </section>
+
+  <app-confirm-dialog
+    title="Delete link?"
+    [message]="deleteMessage()"
+    confirmLabel="Delete link"
+    (confirmed)="confirmDelete()"
+    (cancelled)="onDeleteCancelled()"
+  />
+</section>
