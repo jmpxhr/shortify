@@ -52,6 +52,8 @@ _DEV_ORIGINS = [
     'http://127.0.0.1',
     'http://localhost:3000',
     'http://127.0.0.1:3000',
+    'http://localhost:4200',
+    'http://127.0.0.1:4200',
 ]
 CORS_ALLOWED_ORIGINS.extend(_DEV_ORIGINS)
 CSRF_TRUSTED_ORIGINS.extend(_DEV_ORIGINS)
