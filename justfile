@@ -23,7 +23,7 @@ format:
 lint:
     uv run python -m ruff check --exit-non-zero-on-fix
     uv run python -m ruff format --check --diff
-    uv run python -m flake8 .
+    uv run python -m flake8 server
     uv run import-linter lint --no-logo
 
 [group('lint')]
@@ -44,7 +44,7 @@ import-linter:
 # Run wps linter
 [group('lint')]
 wps:
-    uv run python -m flake8 .
+    uv run python -m flake8 server
 
 # Run all checks
 [group('dev')]
