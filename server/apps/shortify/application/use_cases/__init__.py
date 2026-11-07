@@ -1,3 +1,6 @@
+from server.apps.shortify.application.use_cases.short_link_analytics import (
+    GetLinkAnalytics as GetLinkAnalytics,
+)
 from server.apps.shortify.application.use_cases.short_link_create import (
     CreateShortLink as CreateShortLink,
 )

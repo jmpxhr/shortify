@@ -30,6 +30,24 @@ export interface PaginatedShortLinks {
   readonly page: ShortLinkPage;
 }
 
+export type AnalyticsRange = '7d' | '30d' | '90d' | 'all';
+
+export interface AnalyticsBucket {
+  readonly value: string;
+  readonly count: number;
+}
+
+export interface LinkAnalytics {
+  readonly totalClicks: number;
+  readonly rangeClicks: number;
+  readonly range: AnalyticsRange;
+  readonly countries: readonly AnalyticsBucket[];
+  readonly referrers: readonly AnalyticsBucket[];
+  readonly devices: readonly AnalyticsBucket[];
+  readonly browsers: readonly AnalyticsBucket[];
+  readonly operatingSystems: readonly AnalyticsBucket[];
+}
+
 export interface ApiFieldError {
   readonly loc?: readonly (string | number)[];
   readonly msg: string;

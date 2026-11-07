@@ -64,6 +64,15 @@
         </div>
       </dl>
     </div>
+
+    <app-link-analytics
+      [analytics]="analytics()"
+      [loading]="analyticsLoading()"
+      [errorMessage]="analyticsError()"
+      [range]="analyticsRange()"
+      (rangeChange)="onRangeChange($event)"
+      (retry)="retryAnalytics()"
+    />
   }
 
   <app-confirm-dialog

@@ -48,6 +48,8 @@ services:
 
       volumes:
         - django-static:/var/www/django/static
+        # GeoIP database for click analytics, read-only:
+        - ${GEOIP_DB_HOST_DIR:-./docker/geoip}:/var/lib/geoip:ro
       depends_on:
         db:
           condition: service_healthy

@@ -1,20 +1,27 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from datetime import datetime
 from typing import TYPE_CHECKING, final, override
 
 from django.db import IntegrityError
+from django.db.models import Count, QuerySet
 from django.db.models import F as Field
 
 from server.apps.shortify.application.exceptions import ShortLinkCollisionError
 from server.apps.shortify.application.interfaces.repositories import (
+    ClickEventDimension,
+    ClickEventRepositoryProtocol,
     ShortLinkRepositoryProtocol,
 )
-from server.apps.shortify.domain.entities import ShortLinkEntity
-from server.apps.shortify.infrastructure.models import ShortLink
+from server.apps.shortify.domain.entities import ClickEventEntity, ShortLinkEntity
+from server.apps.shortify.infrastructure.models import ClickEvent, ShortLink
 
 if TYPE_CHECKING:
-    from server.apps.shortify.infrastructure.mappers import ShortLinkDBMapper
+    from server.apps.shortify.infrastructure.mappers import (
+        ClickEventDBMapper,
+        ShortLinkDBMapper,
+    )
     from server.common.transaction import TransactionProtocol
 
 
@@ -99,3 +106,74 @@ class ShortLinkRepository(ShortLinkRepositoryProtocol):
         ShortLink.objects.filter(short_code=short_code).update(
             clicks=Field('clicks') + 1,
         )
+
+
+@final
+@dataclass(frozen=True, slots=True)
+class ClickEventRepository(ClickEventRepositoryProtocol):
+    _mapper: ClickEventDBMapper
+
+    @override
+    def create(  # noqa: WPS211
+        self,
+        *,
+        short_link_id: int,
+        country_code: str | None,
+        region: str | None,
+        city: str | None,
+        referrer_host: str | None,
+        device_type: str | None,
+        browser: str | None,
+        os: str | None,
+    ) -> ClickEventEntity:
+        event_instance = ClickEvent.objects.create(
+            short_link_id=short_link_id,
+            country_code=country_code,
+            region=region,
+            city=city,
+            referrer_host=referrer_host,
+            device_type=device_type,
+            browser=browser,
+            os=os,
+        )
+        return self._mapper.single(event=event_instance)
+
+    @override
+    def count_in_range(
+        self,
+        *,
+        short_link_id: int,
+        since: datetime | None,
+    ) -> int:
+        return self._in_range(
+            short_link_id=short_link_id,
+            since=since,
+        ).count()
+
+    @override
+    def breakdown(
+        self,
+        *,
+        short_link_id: int,
+        dimension: ClickEventDimension,
+        since: datetime | None,
+    ) -> list[tuple[str | None, int]]:
+        rows = (
+            self
+            ._in_range(short_link_id=short_link_id, since=since)
+            .values(dimension)
+            .annotate(count=Count('id'))
+            .order_by('-count', dimension)
+        )
+        return [(row[dimension], row['count']) for row in rows]
+
+    def _in_range(
+        self,
+        *,
+        short_link_id: int,
+        since: datetime | None,
+    ) -> QuerySet[ClickEvent]:
+        queryset = ClickEvent.objects.filter(short_link_id=short_link_id)
+        if since is not None:
+            queryset = queryset.filter(clicked_at__gte=since)
+        return queryset

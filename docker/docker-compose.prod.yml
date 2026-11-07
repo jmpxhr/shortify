@@ -27,6 +27,8 @@ services:
       volumes:
         - django-media:/var/www/django/media  # since in dev it is app's folder
         - django-locale:/code/locale  # since in dev it is app's folder
+        # GeoIP database for click analytics, read-only:
+        - ${GEOIP_DB_HOST_DIR:-./docker/geoip}:/var/lib/geoip:ro
 
     command: bash ./docker/django/gunicorn.sh
     networks:

@@ -4,6 +4,9 @@ import { Observable, map } from 'rxjs';
 
 import { API_BASE_URL } from '../../core/api/api.config';
 import {
+  AnalyticsBucket,
+  AnalyticsRange,
+  LinkAnalytics,
   PaginatedShortLinks,
   ShortLink,
   ShortLinkDetail,
@@ -23,6 +26,22 @@ interface RawShortLinkDetail extends RawShortLink {
 interface RawShortLinkPage {
   readonly number: number;
   readonly object_list: readonly RawShortLink[];
+}
+
+interface RawAnalyticsBucket {
+  readonly value: string;
+  readonly count: number;
+}
+
+interface RawLinkAnalytics {
+  readonly total_clicks: number;
+  readonly range_clicks: number;
+  readonly range: AnalyticsRange;
+  readonly countries: readonly RawAnalyticsBucket[];
+  readonly referrers: readonly RawAnalyticsBucket[];
+  readonly devices: readonly RawAnalyticsBucket[];
+  readonly browsers: readonly RawAnalyticsBucket[];
+  readonly operating_systems: readonly RawAnalyticsBucket[];
 }
 
 interface RawPaginatedShortLinks {
@@ -59,6 +78,15 @@ export class LinksService {
       .pipe(map(mapDetail));
   }
 
+  analytics(shortCode: string, range: AnalyticsRange = '30d'): Observable<LinkAnalytics> {
+    return this.http
+      .get<RawLinkAnalytics>(
+        `${this.baseUrl}/links/${encodeURIComponent(shortCode)}/analytics/`,
+        { params: { range } },
+      )
+      .pipe(map(mapAnalytics));
+  }
+
   remove(shortCode: string): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/links/${encodeURIComponent(shortCode)}/`);
   }
@@ -82,6 +110,26 @@ function mapDetail(raw: RawShortLinkDetail): ShortLinkDetail {
   return {
     ...mapShortLink(raw),
     createdAt: raw.created_at,
+  };
+}
+
+function mapBucket(raw: RawAnalyticsBucket): AnalyticsBucket {
+  return {
+    value: raw.value,
+    count: raw.count,
+  };
+}
+
+function mapAnalytics(raw: RawLinkAnalytics): LinkAnalytics {
+  return {
+    totalClicks: raw.total_clicks,
+    rangeClicks: raw.range_clicks,
+    range: raw.range,
+    countries: raw.countries.map(mapBucket),
+    referrers: raw.referrers.map(mapBucket),
+    devices: raw.devices.map(mapBucket),
+    browsers: raw.browsers.map(mapBucket),
+    operatingSystems: raw.operating_systems.map(mapBucket),
   };
 }
 

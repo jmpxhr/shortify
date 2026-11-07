@@ -1,8 +1,9 @@
 from http import HTTPStatus
 from typing import final, override
+from urllib.parse import urlsplit
 
 from django.contrib.auth.models import User
-from django.http import HttpResponse
+from django.http import HttpRequest, HttpResponse
 from dmr import (
     Controller,
     HeaderSpec,
@@ -19,6 +20,7 @@ from dmr.plugins.msgspec import BodyMsgspec, MsgspecSerializer
 from dmr.security import AuthenticatedHttpRequest
 
 from server.apps.shortify.application import use_cases
+from server.apps.shortify.application.dtos.click_event import ClickContextDTO
 from server.apps.shortify.application.exceptions import (
     ShortLinkCollisionError,
     ShortLinkNotFoundError,
@@ -28,6 +30,10 @@ from server.apps.shortify.application.use_cases.short_link_get import (
 )
 from server.apps.shortify.domain.exceptions import DomainValidationError
 from server.apps.shortify.presentation.api.rest.v1 import mappers
+from server.apps.shortify.presentation.api.rest.v1.analytics_schemas import (
+    ShortLinkAnalyticsQuery,
+    ShortLinkAnalyticsSchema,
+)
 from server.apps.shortify.presentation.api.rest.v1.schemas import (
     ShortLinkCreateSchema,
     ShortLinkDetailSchema,
@@ -172,9 +178,84 @@ class ShortLinkDetailView(HasContainer, Controller[MsgspecSerializer]):
 
 
 @final
+class ShortLinkAnalyticsView(HasContainer, Controller[MsgspecSerializer]):
+    """Return aggregated analytics for one of the authenticated user's links."""
+
+    description = 'Short link analytics.'
+    request: AuthenticatedHttpRequest[User]  # pyrefly: ignore [bad-override-mutable-attribute]
+
+    @modify(
+        extra_responses=[
+            ResponseSpec(
+                Controller.error_model,
+                status_code=HTTPStatus.NOT_FOUND,
+            ),
+        ],
+    )
+    def get(
+        self,
+        parsed_path: Path[ShortLinkPath],
+        parsed_query: Query[ShortLinkAnalyticsQuery],
+    ) -> ShortLinkAnalyticsSchema:
+        """Return the analytics report for my link."""
+        analytics_dto = self.resolve(use_cases.GetLinkAnalytics)(
+            short_code=parsed_path.short_code,
+            owner_id=self.request.user.pk,
+            time_range=parsed_query.range,
+        )
+        return self.resolve(mappers.ShortLinkPresentationMapper).analytics(
+            analytics=analytics_dto,
+        )
+
+    @override
+    def handle_error(
+        self,
+        endpoint: Endpoint,
+        controller: Controller[MsgspecSerializer],
+        exc: Exception,
+    ) -> HttpResponse:
+        if isinstance(exc, ShortLinkNotFoundError):
+            return self.to_error(
+                self.format_error(
+                    'Link not found',
+                    error_type=ErrorType.not_found,
+                ),
+                status_code=HTTPStatus.NOT_FOUND,
+            )
+        return super().handle_error(endpoint, controller, exc)
+
+
+def _client_ip(request: HttpRequest) -> str | None:
+    forwarded_for = request.headers.get('X-Forwarded-For')
+    if forwarded_for:
+        # nginx appends the address it observed, so the last entry is the one
+        # we trust; leading entries are client-controlled.
+        last_forwarded = forwarded_for.split(',')[-1].strip()
+        if last_forwarded:
+            return last_forwarded
+    return request.META.get('REMOTE_ADDR') or None
+
+
+def _referrer_host(request: HttpRequest) -> str | None:
+    referrer = request.headers.get('Referer')
+    if not referrer:
+        return None
+    return urlsplit(referrer).hostname
+
+
+def _build_click_context(request: HttpRequest) -> ClickContextDTO:
+    return ClickContextDTO(
+        ip_address=_client_ip(request),
+        user_agent=request.headers.get('User-Agent'),
+        referrer=_referrer_host(request),
+    )
+
+
+@final
 class RedirectView(HasContainer, Controller[MsgspecSerializer]):
     description = 'Redirect Controller'
     auth = None
+    request: HttpRequest
 
     @modify(
         extra_responses=[
@@ -192,6 +273,7 @@ class RedirectView(HasContainer, Controller[MsgspecSerializer]):
     def get(self, parsed_path: Path[ShortLinkPath]) -> None:
         original_url = self.resolve(GetUrlFromShortLink)(
             short_code=parsed_path.short_code,
+            context=_build_click_context(self.request),
         )
         raise RedirectTo(original_url, status_code=HTTPStatus.FOUND)
 

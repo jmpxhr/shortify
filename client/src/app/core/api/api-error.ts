@@ -3,7 +3,15 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { ApiError, ApiFieldError } from './models';
 
 export type ApiErrorContext =
-  'login' | 'sign-up' | 'logout' | 'list' | 'create-link' | 'detail' | 'delete-link' | 'session';
+  | 'login'
+  | 'sign-up'
+  | 'logout'
+  | 'list'
+  | 'create-link'
+  | 'detail'
+  | 'delete-link'
+  | 'analytics'
+  | 'session';
 
 const FALLBACK = 'Something went wrong. Please try again.';
 const NETWORK_ERROR = 'Cannot reach the server. Check your connection and try again.';

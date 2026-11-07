@@ -216,6 +216,9 @@ __marimo__/
 # Streamlit
 .streamlit/secrets.toml
 
+# GeoIP databases are deployment data, not source:
+*.mmdb
+
 # ---> Angular
 # Angular specific
 /dist/

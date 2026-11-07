@@ -26,6 +26,16 @@ SECRET_KEY: Final = config(
 )
 
 
+# GeoIP
+# https://dev.maxmind.com/geoip/geolite2-free-geolocation-data
+
+_GEOIP_CITY_DB_PATH: Final = config(
+    'GEOIP_CITY_DB_PATH',
+    default='/var/lib/geoip/GeoLite2-City.mmdb',
+)
+
+GEOIP_PATH = _GEOIP_CITY_DB_PATH
+
 # Application definition
 
 _APPS: list[str] = [

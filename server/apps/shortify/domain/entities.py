@@ -36,3 +36,18 @@ class ShortLinkEntity:
             raise DomainValidationError(
                 'original_url must start with http:// or https://',
             )
+
+
+@final
+@dataclass(frozen=True, kw_only=True, slots=True)
+class ClickEventEntity:
+    id: int
+    short_link_id: int
+    clicked_at: datetime
+    country_code: str | None = None
+    region: str | None = None
+    city: str | None = None
+    referrer_host: str | None = None
+    device_type: str | None = None
+    browser: str | None = None
+    os: str | None = None

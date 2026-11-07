@@ -1,0 +1,107 @@
+<section class="card analytics" aria-labelledby="analytics-heading">
+  <div class="analytics__header">
+    <div>
+      <h2 id="analytics-heading">Analytics</h2>
+      <p class="muted">Where your tracked clicks come from.</p>
+    </div>
+
+    <label class="analytics__range">
+      <span>Range</span>
+      <select [value]="range()" [disabled]="loading()" (change)="onRangeChange($event)">
+        @for (option of ranges; track option.value) {
+          <option [value]="option.value">{{ option.label }}</option>
+        }
+      </select>
+    </label>
+  </div>
+
+  @if (loading()) {
+    <div class="stack-sm" role="status">
+      <span class="sr-only">Loading analytics</span>
+      <div class="skeleton analytics__skeleton" aria-hidden="true"></div>
+      <div class="skeleton analytics__skeleton" aria-hidden="true"></div>
+    </div>
+  } @else if (errorMessage(); as message) {
+    <app-error-banner [message]="message" [showRetry]="true" (retry)="retry.emit()" />
+  } @else if (analytics(); as data) {
+    <dl class="analytics__totals">
+      <div class="analytics__stat">
+        <dt>Total clicks</dt>
+        <dd>{{ data.totalClicks }}</dd>
+      </div>
+      <div class="analytics__stat">
+        <dt>Tracked clicks</dt>
+        <dd>{{ data.rangeClicks }}</dd>
+      </div>
+    </dl>
+
+    @if (data.rangeClicks === 0) {
+      <div class="empty-state analytics__empty">
+        <h3>No tracked clicks in this range</h3>
+        <p>Try a wider range to see more activity.</p>
+      </div>
+    } @else {
+      <div class="analytics__breakdowns">
+        <section class="analytics__breakdown" aria-labelledby="analytics-countries">
+          <h3 id="analytics-countries">Countries</h3>
+          <ul class="analytics__list">
+            @for (bucket of data.countries; track bucket.value) {
+              <li>
+                <span>{{ label(bucket.value) }}</span>
+                <span class="analytics__count">{{ bucket.count }}</span>
+              </li>
+            }
+          </ul>
+        </section>
+
+        <section class="analytics__breakdown" aria-labelledby="analytics-referrers">
+          <h3 id="analytics-referrers">Referrers</h3>
+          <ul class="analytics__list">
+            @for (bucket of data.referrers; track bucket.value) {
+              <li>
+                <span>{{ label(bucket.value) }}</span>
+                <span class="analytics__count">{{ bucket.count }}</span>
+              </li>
+            }
+          </ul>
+        </section>
+
+        <section class="analytics__breakdown" aria-labelledby="analytics-devices">
+          <h3 id="analytics-devices">Devices</h3>
+          <ul class="analytics__list">
+            @for (bucket of data.devices; track bucket.value) {
+              <li>
+                <span>{{ label(bucket.value) }}</span>
+                <span class="analytics__count">{{ bucket.count }}</span>
+              </li>
+            }
+          </ul>
+        </section>
+
+        <section class="analytics__breakdown" aria-labelledby="analytics-browsers">
+          <h3 id="analytics-browsers">Browsers</h3>
+          <ul class="analytics__list">
+            @for (bucket of data.browsers; track bucket.value) {
+              <li>
+                <span>{{ label(bucket.value) }}</span>
+                <span class="analytics__count">{{ bucket.count }}</span>
+              </li>
+            }
+          </ul>
+        </section>
+
+        <section class="analytics__breakdown" aria-labelledby="analytics-systems">
+          <h3 id="analytics-systems">Operating systems</h3>
+          <ul class="analytics__list">
+            @for (bucket of data.operatingSystems; track bucket.value) {
+              <li>
+                <span>{{ label(bucket.value) }}</span>
+                <span class="analytics__count">{{ bucket.count }}</span>
+              </li>
+            }
+          </ul>
+        </section>
+      </div>
+    }
+  }
+</section>

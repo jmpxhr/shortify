@@ -6,14 +6,22 @@ import { firstValueFrom } from 'rxjs';
 import { map } from 'rxjs/operators';
 
 import { apiErrorMessage, isNotFound } from '../../core/api/api-error';
-import { ShortLinkDetail } from '../../core/api/models';
+import { AnalyticsRange, LinkAnalytics, ShortLinkDetail } from '../../core/api/models';
 import { ConfirmDialog } from '../../shared/ui/confirm-dialog';
 import { CopyButton } from '../../shared/ui/copy-button';
 import { ErrorBanner } from '../../shared/ui/error-banner';
+import { LinkAnalytics as LinkAnalyticsPanel } from './components/link-analytics';
 import { LinksService } from './links.service';
 
 @Component({
-  imports: [RouterLink, DatePipe, CopyButton, ConfirmDialog, ErrorBanner],
+  imports: [
+    RouterLink,
+    DatePipe,
+    CopyButton,
+    ConfirmDialog,
+    ErrorBanner,
+    LinkAnalyticsPanel,
+  ],
   selector: 'app-link-detail-page',
   styleUrl: './link-detail-page.css',
   templateUrl: './link-detail-page.html',
@@ -34,6 +42,11 @@ export class LinkDetailPage {
   protected readonly errorMessage = signal<string | null>(null);
   protected readonly pendingDelete = signal(false);
 
+  protected readonly analytics = signal<LinkAnalytics | null>(null);
+  protected readonly analyticsLoading = signal(false);
+  protected readonly analyticsError = signal<string | null>(null);
+  protected readonly analyticsRange = signal<AnalyticsRange>('30d');
+
   protected readonly deleteMessage = computed(() => {
     const link = this.link();
     return link ? `Delete ${link.shortCode}? The short URL will stop working.` : '';
@@ -46,6 +59,14 @@ export class LinkDetailPage {
       const shortCode = this.shortCode();
       if (shortCode) {
         void this.load(shortCode);
+      }
+    });
+
+    effect(() => {
+      const shortCode = this.shortCode();
+      const range = this.analyticsRange();
+      if (shortCode) {
+        void this.loadAnalytics(shortCode, range);
       }
     });
   }
@@ -67,6 +88,31 @@ export class LinkDetailPage {
     } finally {
       this.loading.set(false);
     }
+  }
+
+  protected async loadAnalytics(shortCode: string, range: AnalyticsRange): Promise<void> {
+    this.analyticsLoading.set(true);
+    this.analyticsError.set(null);
+
+    try {
+      this.analytics.set(await firstValueFrom(this.linksService.analytics(shortCode, range)));
+    } catch (error) {
+      this.analytics.set(null);
+      this.analyticsError.set(apiErrorMessage(error, 'analytics'));
+    } finally {
+      this.analyticsLoading.set(false);
+    }
+  }
+
+  protected retryAnalytics(): void {
+    const shortCode = this.shortCode();
+    if (shortCode) {
+      void this.loadAnalytics(shortCode, this.analyticsRange());
+    }
+  }
+
+  protected onRangeChange(range: AnalyticsRange): void {
+    this.analyticsRange.set(range);
   }
 
   protected shortUrl(shortCode: string): string {

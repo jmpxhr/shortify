@@ -94,6 +94,54 @@ describe('LinksService', () => {
     });
   });
 
+  it('loads analytics with a range and maps snake_case fields', async () => {
+    const result = firstValueFrom(service.analytics('abc123', '7d'));
+
+    const request = http.expectOne('/api/v1/links/abc123/analytics/?range=7d');
+    expect(request.request.method).toBe('GET');
+    expect(request.request.params.get('range')).toBe('7d');
+    request.flush({
+      total_clicks: 142,
+      range_clicks: 87,
+      range: '7d',
+      countries: [{ value: 'DE', count: 40 }],
+      referrers: [{ value: 'direct', count: 12 }],
+      devices: [{ value: 'mobile', count: 55 }],
+      browsers: [{ value: 'Safari', count: 30 }],
+      operating_systems: [{ value: 'iOS', count: 28 }],
+    });
+
+    await expect(result).resolves.toEqual({
+      totalClicks: 142,
+      rangeClicks: 87,
+      range: '7d',
+      countries: [{ value: 'DE', count: 40 }],
+      referrers: [{ value: 'direct', count: 12 }],
+      devices: [{ value: 'mobile', count: 55 }],
+      browsers: [{ value: 'Safari', count: 30 }],
+      operatingSystems: [{ value: 'iOS', count: 28 }],
+    });
+  });
+
+  it('defaults analytics to the last 30 days', async () => {
+    const result = firstValueFrom(service.analytics('abc123'));
+
+    const request = http.expectOne('/api/v1/links/abc123/analytics/?range=30d');
+    expect(request.request.params.get('range')).toBe('30d');
+    request.flush({
+      total_clicks: 0,
+      range_clicks: 0,
+      range: '30d',
+      countries: [],
+      referrers: [],
+      devices: [],
+      browsers: [],
+      operating_systems: [],
+    });
+
+    await expect(result).resolves.toMatchObject({ range: '30d' });
+  });
+
   it('deletes links', async () => {
     const result = firstValueFrom(service.remove('abc123'));
 
