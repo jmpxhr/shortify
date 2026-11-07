@@ -71,7 +71,7 @@ def _inject_services(
     container.register(
         GeolocationProtocol,
         MaxMindGeolocationService,
-        _db_path=settings.GEOIP_CITY_DB_PATH,
+        _db_path=settings.GEOIP_PATH,
         scope=punq.Scope.singleton,
     )
     container.register(UserAgentParserProtocol, UserAgentsParserService)
